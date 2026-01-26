@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "VishinAndroid"
 include(":app")
+include(":app:screens")
