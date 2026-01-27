@@ -19,55 +19,60 @@ import androidx.compose.ui.unit.dp
 fun PermissionScreen(
     hasSms: Boolean,
     hasNotif: Boolean,
-    onSmsPermissionResult: () -> Unit // Callback när SMS är klart
+    onSmsPermissionResult: () -> Unit
 ) {
     val context = LocalContext.current
 
-    // Launcher för SMS-popupen
+
     val smsLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted -> if (isGranted) onSmsPermissionResult() }
     )
 
-    Column(
-        modifier = Modifier.fillMaxSize().padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text("Välkommen till VishingGuard!", style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("För att appen ska fungera behöver vi två behörigheter:", textAlign = TextAlign.Center)
-        Spacer(modifier = Modifier.height(32.dp))
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Column(
+            modifier = Modifier.fillMaxSize().padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                "Välkommen till VishingGuard!",
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                "För att appen ska fungera behöver vi två behörigheter:",
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(32.dp))
 
-        // KNAPP 1: SMS
-        if (!hasSms) {
-            Button(
-                onClick = { smsLauncher.launch(Manifest.permission.RECEIVE_SMS) },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
-            ) {
-                Text("1. Tillåt SMS (Popup)")
+            if (!hasSms) {
+                Button(
+                    onClick = { smsLauncher.launch(Manifest.permission.RECEIVE_SMS) },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF))
+                ) {
+                    Text("1. Tillåt SMS-åtkomst")
+                }
+            } else {
+                Text(" SMS-åtkomst klar!", color = Color(0xFFFFFFFF))
             }
-        } else {
-            Text(" SMS-åtkomst klar!", color = Color.Green)
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        // KNAPP 2: NOTIFIKATIONER
-        if (!hasNotif) {
-            Button(
-                onClick = {
-                    val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
-                    context.startActivity(intent)
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF03DAC5))
-            ) {
-                Text("2. Tillåt Notiser (Inställningar)")
+            if (!hasNotif) {
+                Button(
+                    onClick = {
+                        val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+                        context.startActivity(intent)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF))
+                ) {
+                    Text("2. Tillåt Notis-åtkomst")
+                }
+            } else {
+                Text(" Notis-åtkomst klar!", color = Color(0xFFFFFFFF))
             }
-        } else {
-            Text(" Notis-åtkomst klar!", color = Color.Green)
         }
     }
 }

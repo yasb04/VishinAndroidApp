@@ -28,11 +28,11 @@ fun VishingAppCoordinator(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    // Använd vår nya PermissionUtils-fil
+
     var hasSms by remember { mutableStateOf(PermissionUtils.hasSmsPermission(context)) }
     var hasNotif by remember { mutableStateOf(PermissionUtils.hasNotificationPermission(context)) }
 
-    // Lyssnare som kollar behörigheter när man kommer tillbaka till appen
+
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
@@ -44,14 +44,13 @@ fun VishingAppCoordinator(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    // Välj vilken skärm som ska visas
+
     if (hasSms && hasNotif) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            // Här "injicerar" vi datan och servicen till skärmen
             FraudCheckScreen(
                 initialMessage = smsMessage,
                 initialSender = smsSender,
-                fraudService = fraudService, // <--- Här skickas den in
+                fraudService = fraudService,
                 modifier = Modifier.padding(innerPadding)
             )
         }
