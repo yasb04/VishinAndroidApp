@@ -8,7 +8,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,11 +29,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.labb.vishinandroid.data.model.FraudRequest
 import com.labb.vishinandroid.data.service.MockFraudDetectionService
+import com.labb.vishinandroid.repositories.SmsRepository
 import com.labb.vishinandroid.ui.theme.VishinAndroidTheme
 import kotlinx.coroutines.launch
 
 @Composable
-fun FraudCheckScreen(modifier: Modifier = Modifier) {
+fun FraudCheckScreen(initialMessage: String = "",
+                     initialSender: String = "",
+                     fraudService: MockFraudDetectionService,
+                     modifier: Modifier = Modifier) {
     var message by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -37,7 +45,7 @@ fun FraudCheckScreen(modifier: Modifier = Modifier) {
     var isLoading by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
-    val service = remember { MockFraudDetectionService() }
+    //val service = remember { MockFraudDetectionService() }
 
     Column(
         modifier = modifier
@@ -87,7 +95,7 @@ fun FraudCheckScreen(modifier: Modifier = Modifier) {
                     val mail = if (email.isBlank()) null else email
 
                     val request = FraudRequest(message, phone, mail)
-                    resultText = service.checkFraud(request)
+                   // resultText = service.checkFraud(request)
                     isLoading = false
                 }
             },
@@ -111,6 +119,29 @@ fun FraudCheckScreen(modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.bodyLarge
             )
         }
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Text("Mottagna SMS (Testlogg):", style = MaterialTheme.typography.titleMedium)
+
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .padding(top = 8.dp)
+        ) {
+            items(SmsRepository.smsList) { sms ->
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                ) {
+                    Column(modifier = Modifier.padding(8.dp)) {
+                        Text(text = "${sms.sender}  •  ${sms.timestamp}", style = MaterialTheme.typography.labelMedium)
+                        Text(text = sms.message, style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -118,6 +149,6 @@ fun FraudCheckScreen(modifier: Modifier = Modifier) {
 @Composable
 fun FraudCheckScreenPreview() {
     VishinAndroidTheme {
-        FraudCheckScreen()
+       // FraudCheckScreen()
     }
 }
