@@ -20,4 +20,18 @@ object PermissionUtils {
         val packageName = context.packageName
         return enabledListeners != null && enabledListeners.contains(packageName)
     }
+
+    fun hasContactsPermission(context: Context): Boolean {
+        return ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.READ_CONTACTS
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    fun hasPhoneStatePermission(context: Context): Boolean {
+        return ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.READ_PHONE_STATE
+        ) == PackageManager.PERMISSION_GRANTED
+    }
 }

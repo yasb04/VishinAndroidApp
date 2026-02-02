@@ -1,5 +1,6 @@
 package com.labb.vishinandroid.data.util
 
+import android.content.Context
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -18,7 +19,6 @@ import com.labb.vishinandroid.data.service.MockFraudDetectionService
 import com.labb.vishinandroid.ui.screens.FraudCheckScreen
 import com.labb.vishinandroid.ui.screens.PermissionScreen
 
-
 @Composable
 fun VishingAppCoordinator(
     smsSender: String,
@@ -31,6 +31,8 @@ fun VishingAppCoordinator(
 
     var hasSms by remember { mutableStateOf(PermissionUtils.hasSmsPermission(context)) }
     var hasNotif by remember { mutableStateOf(PermissionUtils.hasNotificationPermission(context)) }
+    var hasContacts by remember { mutableStateOf(PermissionUtils.hasContactsPermission(context))  }
+    var hasPhoneState by remember { mutableStateOf(PermissionUtils.hasPhoneStatePermission(context)) }
 
 
     DisposableEffect(lifecycleOwner) {
@@ -45,7 +47,7 @@ fun VishingAppCoordinator(
     }
 
 
-    if (hasSms && hasNotif) {
+    if (hasSms && hasNotif && hasContacts && hasPhoneState) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             FraudCheckScreen(
                 initialMessage = smsMessage,
@@ -55,11 +57,17 @@ fun VishingAppCoordinator(
             )
         }
     } else {
-        // Visa den separata permission-skärmen
         PermissionScreen(
             hasSms = hasSms,
             hasNotif = hasNotif,
-            onSmsPermissionResult = { hasSms = true }
+            hasContacts = hasContacts,
+            hasPhoneState = hasPhoneState,
+            onPermissionResult = {
+                hasSms = true
+                hasNotif = true
+                hasContacts = true
+                hasPhoneState = true
+            },
         )
     }
 }
