@@ -7,13 +7,13 @@ plugins {
 android {
     namespace = "com.labb.vishinandroid"
     compileSdk {
-        version = release(36)
+        version = release(34)
     }
 
     defaultConfig {
         applicationId = "com.labb.vishinandroid"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 

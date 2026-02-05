@@ -21,9 +21,12 @@ fun PermissionScreen(
     hasNotif: Boolean,
     hasContacts: Boolean,
     hasPhoneState: Boolean,
+    hasRecordAudio: Boolean,
     onPermissionResult: () -> Unit
 ) {
     val context = LocalContext.current
+
+    val hasOverlay = Settings.canDrawOverlays(context)
 
 
     val smsLauncher = rememberLauncherForActivityResult(
@@ -37,6 +40,12 @@ fun PermissionScreen(
             if (isGranted) { onPermissionResult}
         }
     )
+
+    val recordAudioLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted -> if (isGranted) onPermissionResult() }
+    )
+
 
     val phoneStateLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -113,6 +122,37 @@ fun PermissionScreen(
                 }
             } else {
                 Text(" telefonstatus-åtkomst klar!", color = Color(0xFFFFFFFF))
+            }
+
+            if (!hasRecordAudio) {
+                Button(
+                    onClick = { recordAudioLauncher.launch(Manifest.permission.RECORD_AUDIO) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF)) // Röd för att visa att den är viktig
+                ) {
+                    Text("5. Tillåt Mikrofon (Inspelning)")
+                }
+            } else {
+                Text(" Mikrofon-åtkomst klar!", color = Color(0xFFFFFFFF))
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (!hasOverlay) {
+                Button(
+                    onClick = {
+                        // Denna permission kräver en speciell Intent
+                        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
+                        // intent.data = Uri.parse("package:${context.packageName}") // Valfritt: öppnar direkt för din app
+                        context.startActivity(intent)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF)) // Lila
+                ) {
+                    Text("6. Tillåt 'Visa över andra appar' (Fixar krasch)")
+                }
+            } else {
+                Text("Overlay-åtkomst klar!", color = Color(0xFFFFFFFF))
             }
         }
     }

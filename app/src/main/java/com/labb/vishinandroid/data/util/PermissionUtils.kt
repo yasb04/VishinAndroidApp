@@ -34,4 +34,18 @@ object PermissionUtils {
             Manifest.permission.READ_PHONE_STATE
         ) == PackageManager.PERMISSION_GRANTED
     }
+
+    fun hasMicrophonePermission(context: Context): Boolean {
+        return ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.RECORD_AUDIO
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    fun hasOverlayPermission(context: Context): Boolean {
+        return ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.SYSTEM_ALERT_WINDOW
+        ) == PackageManager.PERMISSION_GRANTED
+    }
 }

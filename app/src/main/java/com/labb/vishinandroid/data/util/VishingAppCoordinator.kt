@@ -33,6 +33,7 @@ fun VishingAppCoordinator(
     var hasNotif by remember { mutableStateOf(PermissionUtils.hasNotificationPermission(context)) }
     var hasContacts by remember { mutableStateOf(PermissionUtils.hasContactsPermission(context))  }
     var hasPhoneState by remember { mutableStateOf(PermissionUtils.hasPhoneStatePermission(context)) }
+    var hasRecordAudio by remember { mutableStateOf(PermissionUtils.hasMicrophonePermission(context)) }
 
 
     DisposableEffect(lifecycleOwner) {
@@ -62,11 +63,13 @@ fun VishingAppCoordinator(
             hasNotif = hasNotif,
             hasContacts = hasContacts,
             hasPhoneState = hasPhoneState,
+            hasRecordAudio = hasRecordAudio,
             onPermissionResult = {
                 hasSms = true
                 hasNotif = true
                 hasContacts = true
                 hasPhoneState = true
+                hasRecordAudio = true
             },
         )
     }
