@@ -45,7 +45,7 @@ fun FraudCheckScreen(initialMessage: String = "",
     var isLoading by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
-    //val service = remember { MockFraudDetectionService() }
+
 
     Column(
         modifier = modifier
@@ -95,7 +95,6 @@ fun FraudCheckScreen(initialMessage: String = "",
                     val mail = if (email.isBlank()) null else email
 
                     val request = FraudRequest(message, phone, mail)
-                    //resultText = service.checkFraud(request)
                     isLoading = false
                 }
             },

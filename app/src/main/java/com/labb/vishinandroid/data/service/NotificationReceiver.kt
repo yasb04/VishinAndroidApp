@@ -7,8 +7,7 @@ import com.labb.vishinandroid.repositories.SmsRepository
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
-import java.sql.Time
-import java.sql.Timestamp
+
 
 class NotificationReceiver : NotificationListenerService() {
 
@@ -28,8 +27,6 @@ class NotificationReceiver : NotificationListenerService() {
             Log.d("VishingGuard", "Notis fångad från $packageName: $title - $text")
 
             if (text.isNotEmpty()) {
-                // Spara till din lista (Samma som förut!)
-                // Vi fejkar tiden här för enkelhetens skull
                 SmsRepository.smsList.add(0, SmsData(title, text, "nu"))
             }
         }

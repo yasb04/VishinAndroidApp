@@ -18,13 +18,11 @@ import java.util.Date
 import java.util.Locale
 
 class RecordingService : Service() {
-
     private var recorder: MediaRecorder? = null
     private var isRecording: Boolean = false
 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-
         startRecordingNotification()
         startRecording()
         return START_STICKY

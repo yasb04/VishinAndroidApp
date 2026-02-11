@@ -18,15 +18,16 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun PermissionScreen(
     hasSms: Boolean,
-    hasNotif: Boolean,
+    hasReadNotif: Boolean,
+    hasPostNotif: Boolean,
     hasContacts: Boolean,
     hasPhoneState: Boolean,
     hasRecordAudio: Boolean,
+    hasOverlay: Boolean,
+    hasCallLog: Boolean,
     onPermissionResult: () -> Unit
 ) {
     val context = LocalContext.current
-
-    val hasOverlay = Settings.canDrawOverlays(context)
 
 
     val smsLauncher = rememberLauncherForActivityResult(
@@ -52,6 +53,17 @@ fun PermissionScreen(
         onResult = { isGranted -> if (isGranted) onPermissionResult() }
     )
 
+    val postNotifLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted -> if (isGranted) onPermissionResult() }
+    )
+
+    val callLogLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted -> if (isGranted) onPermissionResult() }
+    )
+
+
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
             modifier = Modifier.fillMaxSize().padding(innerPadding),
@@ -65,12 +77,12 @@ fun PermissionScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                "För att appen ska fungera behöver vi fyra behörigheter:",
+                "För att appen ska fungera behöver vi några behörigheter:",
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(32.dp))
 
-            if (!hasSms) {
+            if (!hasSms) { //sms knapp
                 Button(
                     onClick = { smsLauncher.launch(Manifest.permission.RECEIVE_SMS) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF))
@@ -83,7 +95,7 @@ fun PermissionScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (!hasNotif) {
+            if (!hasReadNotif) { //läs notifierings knapp
                 Button(
                     onClick = {
                         val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
@@ -99,7 +111,24 @@ fun PermissionScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (!hasContacts) {
+            if (!hasPostNotif) {// skicka notifierings knapp
+                Button(
+                    onClick = {
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                            postNotifLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        } else {
+                            onPermissionResult() // Behövs ej på äldre telefoner
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF))
+                ) { Text("Tillåt att SKICKA notiser") }
+            } else {
+                Text("Skicka notiser klar!", color = Color(0xFFFFFFFF))
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (!hasContacts) { // kontakt knapp
                 Button(
                     onClick = { contactLauncher.launch(Manifest.permission.READ_CONTACTS) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF))
@@ -113,7 +142,7 @@ fun PermissionScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
 
-            if (!hasPhoneState) {
+            if (!hasPhoneState) { //phone state knapp
                 Button(
                     onClick = { phoneStateLauncher.launch(Manifest.permission.READ_PHONE_STATE) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF))
@@ -124,7 +153,9 @@ fun PermissionScreen(
                 Text(" telefonstatus-åtkomst klar!", color = Color(0xFFFFFFFF))
             }
 
-            if (!hasRecordAudio) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (!hasRecordAudio) { // Mikrofon knapp
                 Button(
                     onClick = { recordAudioLauncher.launch(Manifest.permission.RECORD_AUDIO) },
                     modifier = Modifier.fillMaxWidth(),
@@ -138,7 +169,7 @@ fun PermissionScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (!hasOverlay) {
+            if (!hasOverlay) { //overlay knapp
                 Button(
                     onClick = {
                         // Denna permission kräver en speciell Intent
@@ -153,6 +184,17 @@ fun PermissionScreen(
                 }
             } else {
                 Text("Overlay-åtkomst klar!", color = Color(0xFFFFFFFF))
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (!hasCallLog) {
+                Button(
+                    onClick = { callLogLauncher.launch(Manifest.permission.READ_CALL_LOG) },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF))
+                ) { Text("Tillåt Samtalslogg (Se nummer)") }
+            } else {
+                Text("Samtalslogg klar!", color = Color(0xFFFFFFFF))
             }
         }
     }
