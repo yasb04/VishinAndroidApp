@@ -6,9 +6,7 @@ plugins {
 
 android {
     namespace = "com.labb.vishinandroid"
-    compileSdk {
-        version = release(34)
-    }
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.labb.vishinandroid"
@@ -50,6 +48,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    // LiteRT (new name for TFLite) — runtime for the .tflite model
+    implementation(libs.litert)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

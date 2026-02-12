@@ -25,8 +25,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.labb.vishinandroid.data.SwedishFraudLocalModel
 import com.labb.vishinandroid.data.model.FraudRequest
 import com.labb.vishinandroid.data.service.MockFraudDetectionService
 import com.labb.vishinandroid.repositories.SmsRepository
@@ -45,6 +47,7 @@ fun FraudCheckScreen(initialMessage: String = "",
     var isLoading by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     //val service = remember { MockFraudDetectionService() }
 
     Column(
@@ -91,11 +94,18 @@ fun FraudCheckScreen(initialMessage: String = "",
                 isLoading = true
                 resultText = ""
                 scope.launch {
-                    val phone = if (phoneNumber.isBlank()) null else phoneNumber
-                    val mail = if (email.isBlank()) null else email
-
-                    val request = FraudRequest(message, phone, mail)
-                    //resultText = service.checkFraud(request)
+                    try {
+                        val result = SwedishFraudLocalModel.predict(context, message)
+                        val scoresStr = result.scores.joinToString(", ") { "%.4f".format(it) }
+                        resultText = buildString {
+                            appendLine("Model inputs: ${result.inputCount}")
+                            appendLine("Output shape: ${result.outputShape.contentToString()}")
+                            appendLine("Tokens used: ${result.tokenCount}")
+                            appendLine("Raw scores: [$scoresStr]")
+                        }
+                    } catch (e: Exception) {
+                        resultText = "Error: ${e.message}"
+                    }
                     isLoading = false
                 }
             },
