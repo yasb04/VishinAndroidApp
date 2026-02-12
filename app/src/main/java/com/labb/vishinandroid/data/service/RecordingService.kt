@@ -41,10 +41,13 @@ class RecordingService : Service() {
 
         try{
             val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-            val fileName = "scam_$timeStamp.mp4"
+            val fileName = "scamVC_$timeStamp.mp4"
             val file = File(getExternalFilesDir(null), fileName)
             recorder = MediaRecorder().apply {
-                setAudioSource(MediaRecorder.AudioSource.MIC)
+                //setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION) fungerar ej i men ur samtal
+                setAudioSource(MediaRecorder.AudioSource.MIC) //ur inte i
+                //setAudioSource(MediaRecorder.AudioSource.UNPROCESSED) ur inte i
+                //setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION) varken i eller ur
                 setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
                 setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
                 setOutputFile(file.absolutePath)

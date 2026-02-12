@@ -1,7 +1,10 @@
 package com.labb.vishinandroid.ui.screens
 
+import android.content.Intent
+import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -25,10 +29,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.labb.vishinandroid.data.model.FraudRequest
 import com.labb.vishinandroid.data.service.MockFraudDetectionService
+import com.labb.vishinandroid.data.service.RecordingService
 import com.labb.vishinandroid.repositories.SmsRepository
 import com.labb.vishinandroid.ui.theme.VishinAndroidTheme
 import kotlinx.coroutines.launch
@@ -45,6 +51,7 @@ fun FraudCheckScreen(initialMessage: String = "",
     var isLoading by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current // <--- Hämta Context här
 
 
     Column(
@@ -78,6 +85,43 @@ fun FraudCheckScreen(initialMessage: String = "",
             label = { Text("Email (Optional)") },
             modifier = Modifier.fillMaxWidth()
         )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text("🔧 Manuell Testpanel", style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            // START-KNAPP
+            Button(
+                onClick = {
+                    val intent = Intent(context, RecordingService::class.java)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        context.startForegroundService(intent)
+                    } else {
+                        context.startService(intent)
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Text("🔴 Starta Inspelning")
+            }
+
+            // STOPP-KNAPP
+            Button(
+                onClick = {
+                    val intent = Intent(context, RecordingService::class.java)
+                    context.stopService(intent) // Detta triggar onDestroy() i servicen
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+            ) {
+                Text("⏹️ Stoppa")
+            }
+        }
+        // ----------------------------------------------------
 
         Spacer(modifier = Modifier.height(24.dp))
 
