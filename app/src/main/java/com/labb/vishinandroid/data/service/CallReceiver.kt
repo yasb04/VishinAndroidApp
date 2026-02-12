@@ -3,12 +3,11 @@ package com.labb.vishinandroid.data.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.provider.ContactsContract
 import android.telephony.TelephonyManager
 import android.util.Log
-import com.labb.vishinandroid.ui.RecordingOverlay
+import com.labb.vishinandroid.ui.overlay.RecordingOverlay
 
 class CallReceiver : BroadcastReceiver() {
 
