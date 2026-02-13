@@ -1,24 +1,23 @@
-package com.labb.vishinandroid.ui
+package com.labb.vishinandroid.ui.overlay
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.PixelFormat
 import android.os.Build
 import android.util.Log
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
-import com.labb.vishinandroid.R
 import com.labb.vishinandroid.data.service.RecordingService
 
 @SuppressLint("StaticFieldLeak")
 object RecordingOverlay {
     private var overlayView: View? = null
 
-    fun show(context:Context) {
+    fun show(context: Context) {
         try {
             if (overlayView != null) return
             val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
@@ -40,8 +39,8 @@ object RecordingOverlay {
 
             val button = Button(context).apply {
                 text = "Börja spela in samtal?"
-                setBackgroundColor(android.graphics.Color.RED)
-                setTextColor(android.graphics.Color.WHITE)
+                setBackgroundColor(Color.RED)
+                setTextColor(Color.WHITE)
                 setPadding(40, 40, 40, 40)
 
                 setOnClickListener {

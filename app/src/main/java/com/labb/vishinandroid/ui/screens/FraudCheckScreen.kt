@@ -1,7 +1,10 @@
 package com.labb.vishinandroid.ui.screens
 
+import android.content.Intent
+import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -31,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.labb.vishinandroid.data.SwedishFraudLocalModel
 import com.labb.vishinandroid.data.model.FraudRequest
 import com.labb.vishinandroid.data.service.MockFraudDetectionService
+import com.labb.vishinandroid.data.service.RecordingService
 import com.labb.vishinandroid.repositories.SmsRepository
 import com.labb.vishinandroid.ui.theme.VishinAndroidTheme
 import kotlinx.coroutines.launch
@@ -47,8 +52,7 @@ fun FraudCheckScreen(initialMessage: String = "",
     var isLoading by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-    //val service = remember { MockFraudDetectionService() }
+    val context = LocalContext.current // Krävs för både inspelning och AI-modell
 
     Column(
         modifier = modifier
@@ -84,6 +88,42 @@ fun FraudCheckScreen(initialMessage: String = "",
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // --- MANUELL TESTPANEL (Från Main) ---
+        Text("🔧 Manuell Testpanel", style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Button(
+                onClick = {
+                    val intent = Intent(context, RecordingService::class.java)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        context.startForegroundService(intent)
+                    } else {
+                        context.startService(intent)
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Text("🔴 Starta Inspelning")
+            }
+
+            Button(
+                onClick = {
+                    val intent = Intent(context, RecordingService::class.java)
+                    context.stopService(intent)
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+            ) {
+                Text("⏹️ Stoppa")
+            }
+        }
+        // --------------------------------------
+
+        Spacer(modifier = Modifier.height(24.dp))
+
         Button(
             onClick = {
                 if (message.isBlank()) {
@@ -95,13 +135,14 @@ fun FraudCheckScreen(initialMessage: String = "",
                 resultText = ""
                 scope.launch {
                     try {
+                        // --- ENSEMBLE AI LOGIK ---
                         val result = SwedishFraudLocalModel.predict(context, message)
                         resultText = buildString {
                             if (result.isFraud) {
-                                appendLine("Misstänkt bedrägeri!")
+                                appendLine("⚠️ VARNING: Misstänkt bedrägeri!")
                                 appendLine("Enighet: ${result.votes} av 5 modeller varnar")
                             } else {
-                                appendLine("Ser säkert ut")
+                                appendLine("✅ Ser säkert ut")
                                 appendLine("Enighet: ${5 - result.votes} av 5 modeller godkänner")
                             }
                             appendLine("Sannolikhet: ${(result.confidence * 100).toInt()}%")
@@ -132,10 +173,10 @@ fun FraudCheckScreen(initialMessage: String = "",
                 style = MaterialTheme.typography.bodyLarge
             )
         }
+
         Spacer(modifier = Modifier.height(32.dp))
 
         Text("Mottagna SMS (Testlogg):", style = MaterialTheme.typography.titleMedium)
-
 
         LazyColumn(
             modifier = Modifier
@@ -162,6 +203,6 @@ fun FraudCheckScreen(initialMessage: String = "",
 @Composable
 fun FraudCheckScreenPreview() {
     VishinAndroidTheme {
-       // FraudCheckScreen()
+        // FraudCheckScreen()
     }
 }

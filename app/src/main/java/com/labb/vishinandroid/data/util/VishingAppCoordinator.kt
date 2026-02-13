@@ -30,17 +30,28 @@ fun VishingAppCoordinator(
 
 
     var hasSms by remember { mutableStateOf(PermissionUtils.hasSmsPermission(context)) }
-    var hasNotif by remember { mutableStateOf(PermissionUtils.hasNotificationPermission(context)) }
-    var hasContacts by remember { mutableStateOf(PermissionUtils.hasContactsPermission(context))  }
+    var hasReadNotif by remember { mutableStateOf(PermissionUtils.hasReadNotificationPermission(context)) }
+    var hasPostNotif  by remember { mutableStateOf(PermissionUtils.hasPostNotificationPermission(context)) }
+    var hasContacts by remember { mutableStateOf(PermissionUtils.hasContactsPermission(context)) }
     var hasPhoneState by remember { mutableStateOf(PermissionUtils.hasPhoneStatePermission(context)) }
     var hasRecordAudio by remember { mutableStateOf(PermissionUtils.hasMicrophonePermission(context)) }
+    var hasOverlay by remember { mutableStateOf(PermissionUtils.hasOverlayPermission(context)) }
+    var hasCallLog by remember { mutableStateOf(PermissionUtils.hasCallLogPermission(context)) }
 
+    fun refreshAllPermissions() {
+        hasSms = PermissionUtils.hasSmsPermission(context)
+        hasReadNotif = PermissionUtils.hasReadNotificationPermission(context)
+        hasPostNotif = PermissionUtils.hasPostNotificationPermission(context)
+        hasContacts = PermissionUtils.hasContactsPermission(context)
+        hasPhoneState = PermissionUtils.hasPhoneStatePermission(context)
+        hasRecordAudio = PermissionUtils.hasMicrophonePermission(context)
+        hasOverlay = PermissionUtils.hasOverlayPermission(context)
+    }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                hasSms = PermissionUtils.hasSmsPermission(context)
-                hasNotif = PermissionUtils.hasNotificationPermission(context)
+                refreshAllPermissions()
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -48,7 +59,9 @@ fun VishingAppCoordinator(
     }
 
 
-    if (hasSms && hasNotif && hasContacts && hasPhoneState) {
+    val allGranted = hasSms && hasReadNotif && hasPostNotif && hasContacts && hasPhoneState && hasRecordAudio && hasOverlay && hasCallLog
+
+    if (allGranted) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             FraudCheckScreen(
                 initialMessage = smsMessage,
@@ -60,17 +73,14 @@ fun VishingAppCoordinator(
     } else {
         PermissionScreen(
             hasSms = hasSms,
-            hasNotif = hasNotif,
+            hasReadNotif = hasReadNotif,
+            hasPostNotif = hasPostNotif,
             hasContacts = hasContacts,
             hasPhoneState = hasPhoneState,
             hasRecordAudio = hasRecordAudio,
-            onPermissionResult = {
-                hasSms = true
-                hasNotif = true
-                hasContacts = true
-                hasPhoneState = true
-                hasRecordAudio = true
-            },
+            hasOverlay = hasOverlay,
+            hasCallLog = hasCallLog,
+            onPermissionResult = { refreshAllPermissions() }
         )
     }
 }
