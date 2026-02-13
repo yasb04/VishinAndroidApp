@@ -96,12 +96,15 @@ fun FraudCheckScreen(initialMessage: String = "",
                 scope.launch {
                     try {
                         val result = SwedishFraudLocalModel.predict(context, message)
-                        val scoresStr = result.scores.joinToString(", ") { "%.4f".format(it) }
                         resultText = buildString {
-                            appendLine("Model inputs: ${result.inputCount}")
-                            appendLine("Output shape: ${result.outputShape.contentToString()}")
-                            appendLine("Tokens used: ${result.tokenCount}")
-                            appendLine("Raw scores: [$scoresStr]")
+                            if (result.isFraud) {
+                                appendLine("Misstänkt bedrägeri!")
+                                appendLine("Enighet: ${result.votes} av 5 modeller varnar")
+                            } else {
+                                appendLine("Ser säkert ut")
+                                appendLine("Enighet: ${5 - result.votes} av 5 modeller godkänner")
+                            }
+                            appendLine("Sannolikhet: ${(result.confidence * 100).toInt()}%")
                         }
                     } catch (e: Exception) {
                         resultText = "Error: ${e.message}"
