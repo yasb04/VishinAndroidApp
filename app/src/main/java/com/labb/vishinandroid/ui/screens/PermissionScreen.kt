@@ -25,6 +25,7 @@ fun PermissionScreen(
     hasRecordAudio: Boolean,
     hasOverlay: Boolean,
     hasCallLog: Boolean,
+    hasAccessibility: Boolean,
     onPermissionResult: () -> Unit
 ) {
     val context = LocalContext.current
@@ -59,6 +60,11 @@ fun PermissionScreen(
     )
 
     val callLogLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted -> if (isGranted) onPermissionResult() }
+    )
+
+    val accessibilityLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted -> if (isGranted) onPermissionResult() }
     )
@@ -196,6 +202,28 @@ fun PermissionScreen(
             } else {
                 Text("Samtalslogg klar!", color = Color(0xFFFFFFFF))
             }
+
+            if (!hasAccessibility) {
+                Button(
+                    onClick = {
+                        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                        context.startActivity(intent)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF))
+                ) {
+                    Text("7. Tillåt Skärmläsare (Accessibility)")
+                }
+             
+                Text(
+                    text = "(Leta efter VishingGuard Screen Reader)",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+            } else {
+
+                Text("Skärmläsare klar!", color = Color(0xFFFFFFFF))
+            }
+
         }
     }
 }

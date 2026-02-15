@@ -37,6 +37,8 @@ fun VishingAppCoordinator(
     var hasRecordAudio by remember { mutableStateOf(PermissionUtils.hasMicrophonePermission(context)) }
     var hasOverlay by remember { mutableStateOf(PermissionUtils.hasOverlayPermission(context)) }
     var hasCallLog by remember { mutableStateOf(PermissionUtils.hasCallLogPermission(context)) }
+    var hasAccessibility by remember { mutableStateOf(PermissionUtils.hasAccessibility(context)) }
+
 
     fun refreshAllPermissions() {
         hasSms = PermissionUtils.hasSmsPermission(context)
@@ -46,6 +48,8 @@ fun VishingAppCoordinator(
         hasPhoneState = PermissionUtils.hasPhoneStatePermission(context)
         hasRecordAudio = PermissionUtils.hasMicrophonePermission(context)
         hasOverlay = PermissionUtils.hasOverlayPermission(context)
+        hasCallLog = PermissionUtils.hasCallLogPermission(context)
+        hasAccessibility = PermissionUtils.hasAccessibility(context)
     }
 
     DisposableEffect(lifecycleOwner) {
@@ -59,7 +63,11 @@ fun VishingAppCoordinator(
     }
 
 
-    val allGranted = hasSms && hasReadNotif && hasPostNotif && hasContacts && hasPhoneState && hasRecordAudio && hasOverlay && hasCallLog
+    val allGranted = hasSms && hasReadNotif && hasPostNotif
+            && hasContacts && hasPhoneState
+            && hasRecordAudio && hasOverlay
+            && hasCallLog && hasAccessibility
+
 
     if (allGranted) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -80,6 +88,7 @@ fun VishingAppCoordinator(
             hasRecordAudio = hasRecordAudio,
             hasOverlay = hasOverlay,
             hasCallLog = hasCallLog,
+            hasAccessibility = hasAccessibility,
             onPermissionResult = { refreshAllPermissions() }
         )
     }
