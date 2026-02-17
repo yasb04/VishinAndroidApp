@@ -39,7 +39,6 @@ fun VishingAppCoordinator(
     var hasCallLog by remember { mutableStateOf(PermissionUtils.hasCallLogPermission(context)) }
     var hasAccessibility by remember { mutableStateOf(PermissionUtils.hasAccessibility(context)) }
 
-
     fun refreshAllPermissions() {
         hasSms = PermissionUtils.hasSmsPermission(context)
         hasReadNotif = PermissionUtils.hasReadNotificationPermission(context)
@@ -49,7 +48,7 @@ fun VishingAppCoordinator(
         hasRecordAudio = PermissionUtils.hasMicrophonePermission(context)
         hasOverlay = PermissionUtils.hasOverlayPermission(context)
         hasCallLog = PermissionUtils.hasCallLogPermission(context)
-        hasAccessibility = PermissionUtils.hasAccessibility(context)
+        hasAccessibility = PermissionUtils.hasAccessibilityEnabled(context)
     }
 
     DisposableEffect(lifecycleOwner) {
@@ -63,10 +62,8 @@ fun VishingAppCoordinator(
     }
 
 
-    val allGranted = hasSms && hasReadNotif && hasPostNotif
-            && hasContacts && hasPhoneState
-            && hasRecordAudio && hasOverlay
-            && hasCallLog && hasAccessibility
+    val allGranted = hasSms && hasReadNotif && hasPostNotif && hasContacts &&
+            hasPhoneState && hasRecordAudio && hasOverlay && hasCallLog && hasAccessibility
 
 
     if (allGranted) {

@@ -23,6 +23,14 @@ object PermissionUtils {
         return enabledListeners != null && enabledListeners.contains(packageName)
     }
 
+    fun hasAccessibilityEnabled(context: Context): Boolean {
+        val expectedService = "${context.packageName}/${CaptionReadingService::class.java.canonicalName}"
+        val enabledServices = Settings.Secure.getString(
+            context.contentResolver,
+            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+        )
+        return enabledServices?.contains(expectedService) == true
+    }
     fun hasPostNotificationPermission(context: Context): Boolean {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             return ContextCompat.checkSelfPermission(

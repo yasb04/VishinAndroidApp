@@ -29,6 +29,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,6 +37,8 @@ import com.labb.vishinandroid.data.SwedishFraudLocalModel
 import com.labb.vishinandroid.data.model.FraudRequest
 import com.labb.vishinandroid.data.service.MockFraudDetectionService
 import com.labb.vishinandroid.data.service.RecordingService
+import com.labb.vishinandroid.repositories.CallRepository
+import com.labb.vishinandroid.repositories.CallSession
 import com.labb.vishinandroid.repositories.SmsRepository
 import com.labb.vishinandroid.ui.theme.VishinAndroidTheme
 import kotlinx.coroutines.launch
@@ -50,7 +53,7 @@ fun FraudCheckScreen(initialMessage: String = "",
     var email by remember { mutableStateOf("") }
     var resultText by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
-
+    var selectedSession by remember { mutableStateOf<CallSession?>(null) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current // Krävs för både inspelning och AI-modell
 
@@ -175,7 +178,46 @@ fun FraudCheckScreen(initialMessage: String = "",
         }
 
         Spacer(modifier = Modifier.height(32.dp))
+        if (selectedSession == null) {
+            Text("📞 Samtalshistorik", style = MaterialTheme.typography.headlineMedium)
+            Text("Tryck på ett samtal för att se detaljer", style = MaterialTheme.typography.bodySmall)
+            Spacer(modifier = Modifier.height(16.dp))
 
+            LazyColumn(modifier = Modifier.weight(1f)) {
+                items(CallRepository.sessions) { session ->
+                    Card(
+                        onClick = { selectedSession = session },
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (session.isFraudulentCall.value) Color(0xFFFFCDD2) else Color(0xFFE3F2FD))
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text("Från: ${session.phoneNumber}", style = MaterialTheme.typography.titleMedium)
+                            Text("Tid: ${session.startTime}", style = MaterialTheme.typography.labelSmall)
+                        }
+                    }
+                }
+            }
+        } else {
+            // DETALJVY
+            Button(onClick = { selectedSession = null }) { Text("← Tillbaka") }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Dialog med ${selectedSession?.phoneNumber}", style = MaterialTheme.typography.titleLarge)
+
+            LazyColumn(modifier = Modifier.weight(1f).padding(top = 16.dp)) {
+                items(selectedSession!!.dialogue) { msg ->
+                    Column(modifier = Modifier.padding(bottom = 12.dp)) {
+                        Text(msg.timestamp, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                        Text(
+                            text = msg.text,
+                            color = if (msg.isFraud) Color.Red else Color.Black,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(32.dp))
         Text("Mottagna SMS (Testlogg):", style = MaterialTheme.typography.titleMedium)
 
         LazyColumn(
