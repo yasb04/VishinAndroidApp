@@ -26,6 +26,7 @@ fun PermissionScreen(
     hasOverlay: Boolean,
     hasCallLog: Boolean,
     hasAccessibility: Boolean,
+    hasCallScreener: Boolean,
     onPermissionResult: () -> Unit
 ) {
     val context = LocalContext.current
@@ -67,6 +68,11 @@ fun PermissionScreen(
     val accessibilityLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted -> if (isGranted) onPermissionResult() }
+    )
+
+    val callScreenerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = { onPermissionResult() }
     )
 
 
@@ -222,6 +228,23 @@ fun PermissionScreen(
             } else {
 
                 Text("Skärmläsare klar!", color = Color(0xFFFFFFFF))
+            }
+
+            if (!hasCallScreener) {
+                Button(
+                    onClick = {
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                            val roleManager = context.getSystemService(android.app.role.RoleManager::class.java)
+                            val intent = roleManager.createRequestRoleIntent(android.app.role.RoleManager.ROLE_CALL_SCREENING)
+                            callScreenerLauncher.launch(intent)
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF))
+                ) {
+                    Text("8. Aktivera Samtalsskydd (Call Screener)")
+                }
+            } else {
+                Text("Samtalsskydd klart!", color = Color(0xFFFFFFFF))
             }
 
         }

@@ -4,7 +4,9 @@ import android.Manifest
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.provider.Settings
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import com.labb.vishinandroid.data.service.CaptionReadingService
 
@@ -90,5 +92,15 @@ object PermissionUtils {
             }
         }
         return false
+    }
+
+
+
+    fun hasCallScreenerPermission(context: Context): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val roleManager = context.getSystemService(android.app.role.RoleManager::class.java)
+            return roleManager?.isRoleHeld(android.app.role.RoleManager.ROLE_CALL_SCREENING) == true
+        }
+        return true
     }
 }
