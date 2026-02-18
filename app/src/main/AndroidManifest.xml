@@ -16,7 +16,6 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.CALL_SCREENING"/>
 
 
 
@@ -86,16 +85,6 @@
             <meta-data
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_service_config" />
-        </service>
-
-        <service
-            android:name=".data.service.CallScreener"
-            android:label="VishinGuard Call Screener"
-            android:permission="android.permission.BIND_CALL_SCREENING_SERVICE"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.telecom.CallScreeningService"/>
-            </intent-filter>
         </service>
 
         <activity

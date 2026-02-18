@@ -94,13 +94,4 @@ object PermissionUtils {
         return false
     }
 
-
-
-    fun hasCallScreenerPermission(context: Context): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val roleManager = context.getSystemService(android.app.role.RoleManager::class.java)
-            return roleManager?.isRoleHeld(android.app.role.RoleManager.ROLE_CALL_SCREENING) == true
-        }
-        return true
-    }
 }
