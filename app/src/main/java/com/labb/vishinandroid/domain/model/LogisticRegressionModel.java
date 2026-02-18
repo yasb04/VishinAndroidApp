@@ -1,4 +1,4 @@
-package com.labb.vishinandroid.data.model;
+package com.labb.vishinandroid.domain.model;
 
 public class LogisticRegressionModel {
     public static double score(double[] input) {

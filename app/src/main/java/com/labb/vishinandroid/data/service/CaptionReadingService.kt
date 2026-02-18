@@ -5,7 +5,9 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityWindowInfo
-import com.labb.vishinandroid.data.SwedishFraudLocalModel
+import com.labb.vishinandroid.data.factories.FraudDetectorFactory
+import com.labb.vishinandroid.domain.repositories.CallRepository
+import com.labb.vishinandroid.data.interfaces.FraudDetector
 import com.labb.vishinandroid.ui.overlay.OverlayHelper
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
@@ -19,6 +21,7 @@ class CaptionReadingService : AccessibilityService() {
 
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val modelScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private lateinit var fraudDetector: FraudDetector
 
     // Buffer settings
     private val BUFFER_FLUSH_INTERVAL_MS = 2000L // Wait 2s for more speech before analyzing
@@ -125,13 +128,13 @@ class CaptionReadingService : AccessibilityService() {
             modelMutex.withLock {
                 try {
                     Log.d(TAG, "🧠 AI Analyzing: $toAnalyze")
-                    val result = SwedishFraudLocalModel.predict(applicationContext, toAnalyze)
+                    val result = fraudDetector.analyze(toAnalyze)
 
                     withContext(Dispatchers.Main) {
-                        Log.d(TAG, "AI Result: Fraud=${result.isFraud} Conf=${result.confidence}")
-                        com.labb.vishinandroid.repositories.CallRepository.addTextToActiveSession(toAnalyze, result.isFraud)
+                        Log.d(TAG, "AI Result: Fraud=${result.isFraud} Conf=${result.score}")
+                        CallRepository.addTextToActiveSession(toAnalyze, result.isFraud)
                         if (result.isFraud) {
-                            OverlayHelper.showWarningOverlay(applicationContext, toAnalyze, result.confidence)
+                            OverlayHelper.showWarningOverlay(applicationContext, toAnalyze, result.score)
                         }
                     }
                 } catch (e: Exception) {
@@ -143,6 +146,7 @@ class CaptionReadingService : AccessibilityService() {
 
     override fun onServiceConnected() {
         super.onServiceConnected()
+        fraudDetector = FraudDetectorFactory.getDetector(context = applicationContext)
         Log.d(TAG, "VishingGuard: Monitoring Live Caption ($TARGET_CAPTION_ID)")
     }
 

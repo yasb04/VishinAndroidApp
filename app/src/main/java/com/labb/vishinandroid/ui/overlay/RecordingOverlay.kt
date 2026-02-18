@@ -11,7 +11,7 @@ import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
-import com.labb.vishinandroid.data.service.RecordingService
+import com.labb.vishinandroid.data.service.CallMonitoringService
 
 @SuppressLint("StaticFieldLeak")
 object RecordingOverlay {
@@ -45,7 +45,7 @@ object RecordingOverlay {
 
                 setOnClickListener {
                     Log.d("VishingGuard", "Användare tryckte på START")
-                    val intent = Intent(context, RecordingService::class.java)
+                    val intent = Intent(context, CallMonitoringService::class.java)
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         context.startForegroundService(intent)
                     }

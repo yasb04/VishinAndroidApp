@@ -1,17 +1,13 @@
 package com.labb.vishinandroid.data.service
 
-import com.labb.vishinandroid.repositories.SmsData
-import com.labb.vishinandroid.repositories.SmsRepository
-
-
+import com.labb.vishinandroid.domain.repositories.SmsData
+import com.labb.vishinandroid.domain.repositories.SmsRepository
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
-import com.labb.vishinandroid.data.SwedishFraudLocalModel
-import com.labb.vishinandroid.interfaces.FraudDetectorI
-import com.labb.vishinandroid.ml.SimpleRuleBasedDetector
+import com.labb.vishinandroid.data.factories.FraudDetectorFactory
+import com.labb.vishinandroid.data.interfaces.FraudDetector
 import com.labb.vishinandroid.ui.overlay.OverlayHelper
-import com.labb.vishinandroid.ui.overlay.OverlayHelper.showWarningOverlay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,12 +16,12 @@ import kotlinx.coroutines.withContext
 
 class NotificationReceiver : NotificationListenerService() {
 
-    private lateinit var fraudDetector: FraudDetectorI
+    private lateinit var fraudDetector: FraudDetector
 
     override fun onCreate() {
         super.onCreate()
-        // Välj vilken hjärna vi ska använda för att analysera notisarna:
-        fraudDetector = SimpleRuleBasedDetector()
+        fraudDetector = FraudDetectorFactory.getDetector(context = applicationContext)
+
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
@@ -43,14 +39,14 @@ class NotificationReceiver : NotificationListenerService() {
 
             CoroutineScope(Dispatchers.IO).launch {
 
-                val result = SwedishFraudLocalModel.predict(context = applicationContext, text = text)
+                val result = fraudDetector.analyze( text = text)
 
                 if (result.isFraud) {
                     withContext(Dispatchers.Main) {
                         OverlayHelper.showWarningOverlay(
                             context = applicationContext,
                             smsText = text,
-                            score = result.confidence
+                            score = result.score
                         )
                     }
                 }

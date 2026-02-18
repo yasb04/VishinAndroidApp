@@ -1,4 +1,4 @@
-package com.labb.vishinandroid.data.model
+package com.labb.vishinandroid.domain.model
 
 data class FraudRequest(
     val message: String,

@@ -2,60 +2,41 @@ package com.labb.vishinandroid.ui.screens
 
 import android.content.Intent
 import android.os.Build
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.labb.vishinandroid.data.SwedishFraudLocalModel
-import com.labb.vishinandroid.data.model.FraudRequest
-import com.labb.vishinandroid.data.service.MockFraudDetectionService
-import com.labb.vishinandroid.data.service.RecordingService
-import com.labb.vishinandroid.repositories.CallRepository
-import com.labb.vishinandroid.repositories.CallSession
-import com.labb.vishinandroid.repositories.SmsRepository
+import androidx.lifecycle.compose.collectAsStateWithLifecycle // Lägg till denna dependency om den saknas
+import com.labb.vishinandroid.data.service.CallMonitoringService
+import com.labb.vishinandroid.domain.repositories.CallRepository
+import com.labb.vishinandroid.domain.repositories.CallSession
+import com.labb.vishinandroid.domain.repositories.SmsRepository
 import com.labb.vishinandroid.ui.theme.VishinAndroidTheme
-import kotlinx.coroutines.launch
+import com.labb.vishinandroid.ui.vievModel.MainViewModel
 
 @Composable
-fun FraudCheckScreen(initialMessage: String = "",
-                     initialSender: String = "",
-                     fraudService: MockFraudDetectionService,
-                     modifier: Modifier = Modifier) {
+fun FraudCheckScreen(
+    mainViewModel: MainViewModel,
+    modifier: Modifier = Modifier
+) {
+    // 1. Observera states från ViewModel istället för att ha dem lokalt
+    val resultText by mainViewModel.fraudCheckResult.collectAsStateWithLifecycle()
+    val isLoading by mainViewModel.isLoading.collectAsStateWithLifecycle()
+
+    // UI-specifika states som bara rör "navigation" inom skärmen kan vara kvar
     var message by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var resultText by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
     var selectedSession by remember { mutableStateOf<CallSession?>(null) }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current // Krävs för både inspelning och AI-modell
+
+    val context = LocalContext.current
 
     Column(
         modifier = modifier
@@ -91,7 +72,7 @@ fun FraudCheckScreen(initialMessage: String = "",
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // --- MANUELL TESTPANEL (Från Main) ---
+        // --- MANUELL TESTPANEL ---
         Text("🔧 Manuell Testpanel", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -101,7 +82,7 @@ fun FraudCheckScreen(initialMessage: String = "",
         ) {
             Button(
                 onClick = {
-                    val intent = Intent(context, RecordingService::class.java)
+                    val intent = Intent(context, CallMonitoringService::class.java)
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         context.startForegroundService(intent)
                     } else {
@@ -115,7 +96,7 @@ fun FraudCheckScreen(initialMessage: String = "",
 
             Button(
                 onClick = {
-                    val intent = Intent(context, RecordingService::class.java)
+                    val intent = Intent(context, CallMonitoringService::class.java)
                     context.stopService(intent)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
@@ -123,38 +104,15 @@ fun FraudCheckScreen(initialMessage: String = "",
                 Text("⏹️ Stoppa")
             }
         }
-        // --------------------------------------
+        // -------------------------
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // 2. CHECK-KNAPPEN (Anropar nu ViewModel)
         Button(
             onClick = {
-                if (message.isBlank()) {
-                    resultText = "Please enter some text."
-                    return@Button
-                }
-
-                isLoading = true
-                resultText = ""
-                scope.launch {
-                    try {
-                        // --- ENSEMBLE AI LOGIK ---
-                        val result = SwedishFraudLocalModel.predict(context, message)
-                        resultText = buildString {
-                            if (result.isFraud) {
-                                appendLine("⚠️ VARNING: Misstänkt bedrägeri!")
-                                appendLine("Enighet: ${result.votes} av 5 modeller varnar")
-                            } else {
-                                appendLine("✅ Ser säkert ut")
-                                appendLine("Enighet: ${5 - result.votes} av 5 modeller godkänner")
-                            }
-                            appendLine("Sannolikhet: ${(result.confidence * 100).toInt()}%")
-                        }
-                    } catch (e: Exception) {
-                        resultText = "Error: ${e.message}"
-                    }
-                    isLoading = false
-                }
+                // All logik för "vad som händer" ligger nu i ViewModel
+                mainViewModel.analyzeText(message)
             },
             enabled = !isLoading
         ) {
@@ -170,6 +128,7 @@ fun FraudCheckScreen(initialMessage: String = "",
 
         Spacer(modifier = Modifier.height(24.dp))
 
+
         if (resultText.isNotEmpty()) {
             Text(
                 text = resultText,
@@ -178,8 +137,10 @@ fun FraudCheckScreen(initialMessage: String = "",
         }
 
         Spacer(modifier = Modifier.height(32.dp))
+
+        // --- SAMTALSHISTORIK ---
         if (selectedSession == null) {
-            Text("📞 Samtalshistorik", style = MaterialTheme.typography.headlineMedium)
+            Text(" Samtalshistorik", style = MaterialTheme.typography.headlineMedium)
             Text("Tryck på ett samtal för att se detaljer", style = MaterialTheme.typography.bodySmall)
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -199,7 +160,7 @@ fun FraudCheckScreen(initialMessage: String = "",
                 }
             }
         } else {
-            // DETALJVY
+
             Button(onClick = { selectedSession = null }) { Text("← Tillbaka") }
             Spacer(modifier = Modifier.height(16.dp))
             Text("Dialog med ${selectedSession?.phoneNumber}", style = MaterialTheme.typography.titleLarge)
@@ -217,6 +178,7 @@ fun FraudCheckScreen(initialMessage: String = "",
                 }
             }
         }
+
         Spacer(modifier = Modifier.height(32.dp))
         Text("Mottagna SMS (Testlogg):", style = MaterialTheme.typography.titleMedium)
 
@@ -226,6 +188,7 @@ fun FraudCheckScreen(initialMessage: String = "",
                 .height(200.dp)
                 .padding(top = 8.dp)
         ) {
+
             items(SmsRepository.smsList) { sms ->
                 Card(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
@@ -245,6 +208,6 @@ fun FraudCheckScreen(initialMessage: String = "",
 @Composable
 fun FraudCheckScreenPreview() {
     VishinAndroidTheme {
-        // FraudCheckScreen()
+
     }
 }

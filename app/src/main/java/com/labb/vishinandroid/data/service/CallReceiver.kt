@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.telephony.TelephonyManager
 import android.util.Log
-import com.labb.vishinandroid.repositories.CallRepository
+import com.labb.vishinandroid.domain.repositories.CallRepository
 import com.labb.vishinandroid.ui.overlay.RecordingOverlay
 
 class CallReceiver : BroadcastReceiver() {

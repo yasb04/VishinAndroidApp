@@ -56,7 +56,7 @@
         </service>
 
         <service
-            android:name=".data.service.RecordingService"
+            android:name=".data.service.CallMonitoringService"
             android:foregroundServiceType="microphone"
             android:exported="false">
         </service>

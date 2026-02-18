@@ -1,6 +1,5 @@
 package com.labb.vishinandroid.data.util
 
-import android.content.Context
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -15,29 +14,33 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.labb.vishinandroid.data.service.MockFraudDetectionService
+import androidx.lifecycle.viewmodel.compose.viewModel
+
 import com.labb.vishinandroid.ui.screens.FraudCheckScreen
 import com.labb.vishinandroid.ui.screens.PermissionScreen
+import com.labb.vishinandroid.ui.vievModel.MainViewModel
 
 @Composable
-fun VishingAppCoordinator(
+fun PermissionCoordinator(
     smsSender: String,
-    smsMessage: String,
-    fraudService: MockFraudDetectionService
+    smsMessage: String
+    // fraudService togs bort här - ViewModel sköter detta nu via Factory!
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-
+    // Initiera states
     var hasSms by remember { mutableStateOf(PermissionUtils.hasSmsPermission(context)) }
     var hasReadNotif by remember { mutableStateOf(PermissionUtils.hasReadNotificationPermission(context)) }
-    var hasPostNotif  by remember { mutableStateOf(PermissionUtils.hasPostNotificationPermission(context)) }
+    var hasPostNotif by remember { mutableStateOf(PermissionUtils.hasPostNotificationPermission(context)) }
     var hasContacts by remember { mutableStateOf(PermissionUtils.hasContactsPermission(context)) }
     var hasPhoneState by remember { mutableStateOf(PermissionUtils.hasPhoneStatePermission(context)) }
     var hasRecordAudio by remember { mutableStateOf(PermissionUtils.hasMicrophonePermission(context)) }
     var hasOverlay by remember { mutableStateOf(PermissionUtils.hasOverlayPermission(context)) }
     var hasCallLog by remember { mutableStateOf(PermissionUtils.hasCallLogPermission(context)) }
-    var hasAccessibility by remember { mutableStateOf(PermissionUtils.hasAccessibility(context)) }
+
+    // FIXAT: Använd rätt namn "hasAccessibilityEnabled" här också
+    var hasAccessibility by remember { mutableStateOf(PermissionUtils.hasAccessibilityEnabled(context)) }
 
     fun refreshAllPermissions() {
         hasSms = PermissionUtils.hasSmsPermission(context)
@@ -61,17 +64,17 @@ fun VishingAppCoordinator(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-
     val allGranted = hasSms && hasReadNotif && hasPostNotif && hasContacts &&
             hasPhoneState && hasRecordAudio && hasOverlay && hasCallLog && hasAccessibility
 
-
     if (allGranted) {
+
+        val mainViewModel: MainViewModel = viewModel()
+
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+
             FraudCheckScreen(
-                initialMessage = smsMessage,
-                initialSender = smsSender,
-                fraudService = fraudService,
+                mainViewModel = mainViewModel,
                 modifier = Modifier.padding(innerPadding)
             )
         }

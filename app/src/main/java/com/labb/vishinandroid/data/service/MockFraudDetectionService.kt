@@ -1,7 +1,7 @@
 package com.labb.vishinandroid.data.service
 
-import com.labb.vishinandroid.data.model.FraudRequest
-import kotlinx.coroutines.delay
+import com.labb.vishinandroid.data.interfaces.FraudDetectionService
+import com.labb.vishinandroid.domain.model.FraudRequest
 
 class MockFraudDetectionService : FraudDetectionService {
     override suspend fun checkFraud(request: FraudRequest): String {

@@ -1,11 +1,10 @@
-package com.labb.vishinandroid.ml
+package com.labb.vishinandroid.data.fraudDetectors
 
 
+import com.labb.vishinandroid.data.interfaces.FraudDetector
+import com.labb.vishinandroid.data.util.AnalysisResult
 
-import com.labb.vishinandroid.interfaces.AnalysisResult
-import com.labb.vishinandroid.interfaces.FraudDetectorI
-
-class SimpleRuleBasedDetector : FraudDetectorI {
+class SimpleRuleBasedDetector : FraudDetector {
     override suspend fun analyze(text: String): AnalysisResult {
         val lowerText = text.lowercase()
 

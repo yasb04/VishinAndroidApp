@@ -1,4 +1,4 @@
-package com.labb.vishinandroid.repositories
+package com.labb.vishinandroid.domain.repositories
 
 import androidx.compose.runtime.mutableStateListOf
 

@@ -6,12 +6,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import com.labb.vishinandroid.data.service.MockFraudDetectionService
-import com.labb.vishinandroid.data.util.VishingAppCoordinator
+import com.labb.vishinandroid.data.util.PermissionCoordinator
 import com.labb.vishinandroid.ui.theme.VishinAndroidTheme
 
 class MainActivity : ComponentActivity() {
 
-    private val fraudService = MockFraudDetectionService()
 
     private var smsSenderState = mutableStateOf("-")
     private var smsMessageState = mutableStateOf("-")
@@ -23,10 +22,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             VishinAndroidTheme {
 
-                VishingAppCoordinator(
+                PermissionCoordinator(
                     smsSender = smsSenderState.value,
-                    smsMessage = smsMessageState.value,
-                    fraudService = fraudService
+                    smsMessage = smsMessageState.value
                 )
             }
         }
