@@ -7,6 +7,7 @@ import com.labb.vishinandroid.repositories.SmsRepository
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
+import com.labb.vishinandroid.data.SwedishFraudLocalModel
 import com.labb.vishinandroid.interfaces.FraudDetectorI
 import com.labb.vishinandroid.ml.SimpleRuleBasedDetector
 import com.labb.vishinandroid.ui.overlay.OverlayHelper
@@ -42,14 +43,14 @@ class NotificationReceiver : NotificationListenerService() {
 
             CoroutineScope(Dispatchers.IO).launch {
 
-                val result = fraudDetector.analyze(text)
+                val result = SwedishFraudLocalModel.predict(context = applicationContext, text = text)
 
                 if (result.isFraud) {
                     withContext(Dispatchers.Main) {
                         OverlayHelper.showWarningOverlay(
                             context = applicationContext,
                             smsText = text,
-                            score = result.score
+                            score = result.confidence
                         )
                     }
                 }

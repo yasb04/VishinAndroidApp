@@ -3,6 +3,8 @@ package com.labb.vishinandroid.data
 import android.content.Context
 import android.util.Log
 import com.labb.vishinandroid.data.model.* // Importerar DecisionTree, RandomForest, etc.
+import com.labb.vishinandroid.interfaces.AnalysisResult
+import com.labb.vishinandroid.interfaces.FraudDetectorI
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
