@@ -16,7 +16,7 @@ class AppInterventionService : AccessibilityService() {
 
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     // Lista för vilka appar vi redan varnat för, så man inte "spammar" overlayen (annars är den alltid på)
-   /* private val warnedPackages = mutableSetOf<String>()
+    private val warnedPackages = mutableSetOf<String>()
 
     override fun onServiceConnected() {
         super.onServiceConnected()
@@ -28,7 +28,7 @@ class AppInterventionService : AccessibilityService() {
                 }
             }
         }
-    } */
+    }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if(event == null) return
@@ -39,12 +39,12 @@ class AppInterventionService : AccessibilityService() {
             Log.d("VishingGuard_Package","Öppnad app: ${packageName}")
             // Om appens paketnamn är med i listan så visas interventionoverlay
             if(SensitiveApps.isSensitiveApp(packageName)){
-                //    if(CallStateRepository.isCallUnknown.value){ ta bort kommentar efter - detta för test
-                    //    if(!warnedPackages.contains(packageName)) {
-                            InterventionOverlay.show(applicationContext)
-                     //       warnedPackages.add(packageName)
-                    //    }
-                  //  } ta bort komentar efter  detta för test
+                    if(CallStateRepository.isCallUnknown.value){
+                        if(!warnedPackages.contains(packageName)) {
+                            InterventionOverlay.show(this)
+                            warnedPackages.add(packageName)
+                        }
+                    }
             }
         }
     }
