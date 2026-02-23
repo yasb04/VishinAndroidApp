@@ -8,9 +8,11 @@ import android.provider.ContactsContract
 import android.telephony.TelephonyManager
 import android.util.Log
 import com.labb.vishinandroid.domain.repositories.CallRepository
+import com.labb.vishinandroid.domain.repositories.CallStateRepository
 import com.labb.vishinandroid.ui.overlay.RecordingOverlay
 
 class CallReceiver : BroadcastReceiver() {
+
     private val TAG = "VishingGuard_DEBUG"
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -24,6 +26,7 @@ class CallReceiver : BroadcastReceiver() {
                 TelephonyManager.EXTRA_STATE_OFFHOOK -> {
                     Log.d(TAG, "Samtal besvarat. Initierar loggning.")
                     CallRepository.startNewSession(incomingNumber)
+
                     // Kontrollera om numret är känt
                     val isKnownContact = if (!incomingNumber.isNullOrEmpty()) {
                         inPhoneBook(incomingNumber, context)
@@ -39,6 +42,8 @@ class CallReceiver : BroadcastReceiver() {
                         Log.d("VishingGuard", "Känd kontakt. Inget säkerhetsläge.")
                         CallStateRepository.setCallUnknown(false)
                     }
+
+
                     RecordingOverlay.show(context)
                 }
                 TelephonyManager.EXTRA_STATE_IDLE -> {
@@ -46,11 +51,9 @@ class CallReceiver : BroadcastReceiver() {
                     RecordingOverlay.hide(context)
                 }
             }
-        } finally {
-            answer?.close()
         }
-        return false
     }
+
 
     fun inPhoneBook(phoneNumber: String, context: Context): Boolean {
         val question = Uri.withAppendedPath(
@@ -67,5 +70,4 @@ class CallReceiver : BroadcastReceiver() {
         }
         return false
     }
-
 }

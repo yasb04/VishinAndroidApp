@@ -4,7 +4,7 @@ import android.accessibilityservice.AccessibilityService
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import com.labb.vishinandroid.data.util.SensitiveApps
-import com.labb.vishinandroid.repositories.CallStateRepository
+import com.labb.vishinandroid.domain.repositories.CallStateRepository
 import com.labb.vishinandroid.ui.overlay.InterventionOverlay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob

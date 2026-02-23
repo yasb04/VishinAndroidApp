@@ -32,6 +32,8 @@ object CallRepository {
 
     private var currentSession: CallSession? = null
 
+
+
     fun startNewSession(number: String) {
         val time = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
         val newSession = CallSession(phoneNumber = number, startTime = time)
