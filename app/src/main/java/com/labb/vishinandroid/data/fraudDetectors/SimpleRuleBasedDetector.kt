@@ -9,10 +9,10 @@ class SimpleRuleBasedDetector : FraudDetector {
         val lowerText = text.lowercase()
 
 
-        if (lowerText.contains("bankid") ||
-            lowerText.contains("swish") ||
+        if (lowerText.contains("kala") ||
+          //  lowerText.contains("swish") ||
             lowerText.contains("polisen") ||
-            lowerText.contains("kort") ||
+            lowerText.contains("ksort") ||
             lowerText.contains("scam"))
                 {
 

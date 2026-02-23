@@ -3,6 +3,8 @@ package com.labb.vishinandroid.data.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.provider.ContactsContract
 import android.telephony.TelephonyManager
 import android.util.Log
 import com.labb.vishinandroid.domain.repositories.CallRepository
@@ -22,6 +24,21 @@ class CallReceiver : BroadcastReceiver() {
                 TelephonyManager.EXTRA_STATE_OFFHOOK -> {
                     Log.d(TAG, "Samtal besvarat. Initierar loggning.")
                     CallRepository.startNewSession(incomingNumber)
+                    // Kontrollera om numret är känt
+                    val isKnownContact = if (!incomingNumber.isNullOrEmpty()) {
+                        inPhoneBook(incomingNumber, context)
+                    } else {
+                        // Om numret är dolt eller null, betrakta det som okänt för säkerhets skull
+                        false
+                    }
+
+                    if (!isKnownContact) {
+                        Log.d("VishingGuard", "Okänt nummer detekterat! Aktiverar säkerhetsläge.")
+                        CallStateRepository.setCallUnknown(true)
+                    } else {
+                        Log.d("VishingGuard", "Känd kontakt. Inget säkerhetsläge.")
+                        CallStateRepository.setCallUnknown(false)
+                    }
                     RecordingOverlay.show(context)
                 }
                 TelephonyManager.EXTRA_STATE_IDLE -> {
@@ -29,6 +46,26 @@ class CallReceiver : BroadcastReceiver() {
                     RecordingOverlay.hide(context)
                 }
             }
+        } finally {
+            answer?.close()
         }
+        return false
     }
+
+    fun inPhoneBook(phoneNumber: String, context: Context): Boolean {
+        val question = Uri.withAppendedPath(
+            ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+            Uri.encode(phoneNumber)
+        )
+        val answer = context.contentResolver.query(question, null, null, null, null)
+        try {
+            if (answer != null && answer.moveToFirst()) {
+                return true
+            }
+        } finally {
+            answer?.close()
+        }
+        return false
+    }
+
 }
