@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         handleIncomingIntent(intent)
     }
-
+    // ser bra ut ! 
     private fun handleIncomingIntent(intent: Intent?) {
         intent?.let {
             val sender = it.getStringExtra("sender")
