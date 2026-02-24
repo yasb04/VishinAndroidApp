@@ -18,6 +18,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 import com.labb.vishinandroid.ui.screens.FraudCheckScreen
 import com.labb.vishinandroid.ui.screens.PermissionScreen
+import com.labb.vishinandroid.ui.screens.SecureCallScreen
 import com.labb.vishinandroid.ui.vievModel.MainViewModel
 
 @Composable
@@ -29,7 +30,7 @@ fun PermissionCoordinator(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    // Initiera states
+    // Initiera states (endast det som behövs för VoIP-MVP)
     var hasSms by remember { mutableStateOf(PermissionUtils.hasSmsPermission(context)) }
     var hasReadNotif by remember { mutableStateOf(PermissionUtils.hasReadNotificationPermission(context)) }
     var hasPostNotif by remember { mutableStateOf(PermissionUtils.hasPostNotificationPermission(context)) }
@@ -38,9 +39,6 @@ fun PermissionCoordinator(
     var hasRecordAudio by remember { mutableStateOf(PermissionUtils.hasMicrophonePermission(context)) }
     var hasOverlay by remember { mutableStateOf(PermissionUtils.hasOverlayPermission(context)) }
     var hasCallLog by remember { mutableStateOf(PermissionUtils.hasCallLogPermission(context)) }
-
-    // FIXAT: Använd rätt namn "hasAccessibilityEnabled" här också
-    var hasAccessibility by remember { mutableStateOf(PermissionUtils.hasAccessibilityEnabled(context)) }
 
     fun refreshAllPermissions() {
         hasSms = PermissionUtils.hasSmsPermission(context)
@@ -51,7 +49,6 @@ fun PermissionCoordinator(
         hasRecordAudio = PermissionUtils.hasMicrophonePermission(context)
         hasOverlay = PermissionUtils.hasOverlayPermission(context)
         hasCallLog = PermissionUtils.hasCallLogPermission(context)
-        hasAccessibility = PermissionUtils.hasAccessibilityEnabled(context)
     }
 
     DisposableEffect(lifecycleOwner) {
@@ -64,19 +61,26 @@ fun PermissionCoordinator(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    val allGranted = hasSms && hasReadNotif && hasPostNotif && hasContacts &&
-            hasPhoneState && hasRecordAudio && hasOverlay && hasCallLog && hasAccessibility
+    val allGranted = hasRecordAudio
+
+    var showSecureCall by remember { mutableStateOf(false) }
 
     if (allGranted) {
 
         val mainViewModel: MainViewModel = viewModel()
 
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
-            FraudCheckScreen(
-                mainViewModel = mainViewModel,
-                modifier = Modifier.padding(innerPadding)
-            )
+            if (showSecureCall) {
+                SecureCallScreen(
+                    onBackToFraudCheck = { showSecureCall = false },
+                )
+            } else {
+                FraudCheckScreen(
+                    mainViewModel = mainViewModel,
+                    modifier = Modifier.padding(innerPadding),
+                    onOpenSecureCall = { showSecureCall = true }
+                )
+            }
         }
     } else {
         PermissionScreen(
@@ -88,7 +92,7 @@ fun PermissionCoordinator(
             hasRecordAudio = hasRecordAudio,
             hasOverlay = hasOverlay,
             hasCallLog = hasCallLog,
-            hasAccessibility = hasAccessibility,
+            hasAccessibility = true,
             onPermissionResult = { refreshAllPermissions() }
         )
     }
