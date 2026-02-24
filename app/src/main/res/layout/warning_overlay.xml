@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="16dp"
-    app:cardBackgroundColor="#FFEBEE"
+    app:cardBackgroundColor="#FFF0F3"
     app:cardCornerRadius="16dp"
-    app:cardElevation="10dp">
+    app:cardElevation="12dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,18 +19,18 @@
             android:layout_height="wrap_content"
             android:text="VishingGuard Varning"
             android:textColor="#D32F2F"
-            android:textStyle="bold"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/fraud_score"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Sannolikhet för bedrägeri: 89%"
+            android:layout_marginTop="4dp"
+            android:text="Riskbedömning: 89%"
             android:textColor="#B71C1C"
-            android:textStyle="bold"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <View
             android:layout_width="match_parent"
@@ -41,29 +41,38 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Analyserat meddelande:"
+            android:text="Analyserat innehåll:"
             android:textColor="#7F0000"
             android:textSize="12sp" />
 
-        <TextView
-            android:id="@+id/sms_content"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Grattis! Du har vunnit en iPhone..."
-            android:textColor="#212121"
-            android:fontFamily="monospace"
+            android:layout_height="150dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
             android:background="#FFFFFF"
             android:padding="8dp"
-            android:textSize="14sp" />
+            android:scrollbars="vertical">
+
+            <TextView
+                android:id="@+id/sms_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:lineSpacingExtra="4dp"
+                android:text="Här kommer texten att visas..."
+                android:textColor="#212121"
+                android:textSize="14sp" />
+
+        </ScrollView>
 
         <Button
             android:id="@+id/btn_close_overlay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Stäng"
             android:backgroundTint="#D32F2F"
+            android:text="Stäng"
             android:textColor="#FFFFFF" />
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>
