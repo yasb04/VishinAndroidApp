@@ -4,6 +4,7 @@ import android.accessibilityservice.AccessibilityService
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import com.labb.vishinandroid.data.util.SensitiveApps
+import com.labb.vishinandroid.data.util.ServiceReEnableHelper
 import com.labb.vishinandroid.domain.repositories.CallStateRepository
 import com.labb.vishinandroid.ui.overlay.InterventionOverlay
 import kotlinx.coroutines.CoroutineScope
@@ -20,6 +21,10 @@ class AppInterventionService : AccessibilityService() {
 
     override fun onServiceConnected() {
         super.onServiceConnected()
+        // Nollställ BankID-flaggan när tjänsten startas då användaren har aktiverat igen
+        SensitiveApps.isSensitiveAppInForeground.set(false)
+        ServiceReEnableHelper.cancelNotification(this)
+
         // Nollställer listan när samtalet avslutas
         serviceScope.launch {
             CallStateRepository.isCallUnknown.collectLatest { isUnknownCall ->
@@ -37,14 +42,32 @@ class AppInterventionService : AccessibilityService() {
         if(event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED){
             val packageName = event.packageName?.toString() ?: return
             Log.d("VishingGuard_Package","Öppnad app: ${packageName}")
-            // Om appens paketnamn är med i listan så visas interventionoverlay
+
+            // Om BankID öppnas så inaktiverar man tjänsterna helt så BankID inte blockeras
+            if (packageName == "com.bankid.bus") {
+                Log.d("VishingGuard_Package", "BankID detekterat – inaktiverar tjänster via disableSelf()")
+
+                // Sätt flagga så att CaptionReadingService också inaktiveras, annars funkar inte BankID
+                SensitiveApps.isSensitiveAppInForeground.set(true)
+
+                InterventionOverlay.hide(this)
+
+                // Notifikation för att återaktivera
+                ServiceReEnableHelper.showReEnableNotification(this)
+
+                // Inaktivera denna tjänst – tar bort den från systemets lista
+                disableSelf()
+                return
+            }
+
+            // Övriga känsliga appar (Swish, banker) visar intervention-overlay vid okänt samtal
             if(SensitiveApps.isSensitiveApp(packageName)){
-                    if(CallStateRepository.isCallUnknown.value){
-                        if(!warnedPackages.contains(packageName)) {
-                            InterventionOverlay.show(this)
-                            warnedPackages.add(packageName)
-                        }
+                if(CallStateRepository.isCallUnknown.value){
+                    if(!warnedPackages.contains(packageName)) {
+                        InterventionOverlay.show(this)
+                        warnedPackages.add(packageName)
                     }
+                }
             }
         }
     }

@@ -8,6 +8,8 @@ import android.view.accessibility.AccessibilityWindowInfo
 import com.labb.vishinandroid.data.factories.FraudDetectorFactory
 import com.labb.vishinandroid.domain.repositories.CallRepository
 import com.labb.vishinandroid.data.interfaces.FraudDetector
+import com.labb.vishinandroid.data.util.SensitiveApps
+import com.labb.vishinandroid.data.util.ServiceReEnableHelper
 import com.labb.vishinandroid.ui.overlay.OverlayHelper
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
@@ -35,6 +37,14 @@ class CaptionReadingService : AccessibilityService() {
     private val modelMutex = Mutex()
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        // Om en BankID detekterats så inaktiverar man tjänsten
+        if (SensitiveApps.isSensitiveAppInForeground.get()) {
+            Log.d(TAG, "BankID-läge aktivt – inaktiverar CaptionReadingService via disableSelf()")
+            ServiceReEnableHelper.showReEnableNotification(this)
+            disableSelf()
+            return
+        }
+
         // Scans all windows (required for system overlays like Live Caption)
         val currentWindows = windows
         for (window in currentWindows) {
@@ -146,6 +156,10 @@ class CaptionReadingService : AccessibilityService() {
 
     override fun onServiceConnected() {
         super.onServiceConnected()
+        // Nollställ BankID-flaggan när tjänsten startas (användaren har aktiverat igen)
+        SensitiveApps.isSensitiveAppInForeground.set(false)
+        ServiceReEnableHelper.cancelNotification(this)
+
         fraudDetector = FraudDetectorFactory.getDetector(context = applicationContext)
         Log.d(TAG, "VishingGuard: Monitoring Live Caption ($TARGET_CAPTION_ID)")
     }
