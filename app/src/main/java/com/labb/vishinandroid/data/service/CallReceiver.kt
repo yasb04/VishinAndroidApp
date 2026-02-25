@@ -48,6 +48,7 @@ class CallReceiver : BroadcastReceiver() {
                 }
                 TelephonyManager.EXTRA_STATE_IDLE -> {
                     Log.d(TAG, "Samtal avslutat.")
+                    CallStateRepository.setCallUnknown(false)
                     RecordingOverlay.hide(context)
                 }
             }
