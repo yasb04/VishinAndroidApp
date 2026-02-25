@@ -14,6 +14,9 @@
 .cxx
 local.properties
 
+# secrets
+.env
+
 # Created by https://www.toptal.com/developers/gitignore/api/androidstudio,kotlin,windows,macos,java
 # Edit at https://www.toptal.com/developers/gitignore?templates=androidstudio,kotlin,windows,macos,java
 

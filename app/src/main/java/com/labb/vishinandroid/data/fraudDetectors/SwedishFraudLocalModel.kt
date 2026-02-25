@@ -5,6 +5,8 @@ import android.util.Log
 
 import com.labb.vishinandroid.data.interfaces.FraudDetector
 import com.labb.vishinandroid.data.util.AnalysisResult
+import com.labb.vishinandroid.domain.model.LowConfidenceFraudEvent
+import com.labb.vishinandroid.domain.repositories.FraudEventRepository
 import com.labb.vishinandroid.domain.model.DecisionTree
 import com.labb.vishinandroid.domain.model.LogisticRegression
 import com.labb.vishinandroid.domain.model.LogisticRegressionModel
@@ -15,11 +17,15 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 
 
-class SwedishFraudLocalModel(private val context: Context) : FraudDetector {
+class SwedishFraudLocalModel(
+    private val context: Context,
+    private val fraudEventRepository: FraudEventRepository,
+) : FraudDetector {
 
     companion object {
         private const val VECTOR_SIZE = 1000
         private const val TAG = "SwedishFraudModel"
+        private const val LOW_CONFIDENCE_THRESHOLD = 0.40f
     }
 
     private val vocab: Map<String, Int> by lazy {
@@ -62,6 +68,23 @@ class SwedishFraudLocalModel(private val context: Context) : FraudDetector {
         val confidence = totalVotes.toFloat() / 5.0f // T.ex. 0.8 om 4 av 5 håller med
 
         Log.d(TAG, "Ensemble Resultat: $isFraud (Röster: $totalVotes/5)")
+
+        if (confidence <= LOW_CONFIDENCE_THRESHOLD) {
+            fraudEventRepository.saveLowConfidenceEvent(
+                LowConfidenceFraudEvent(
+                    text = text,
+                    accuracy = confidence,
+                    metadata = buildString {
+                        append("votes=")
+                        append(totalVotes)
+                        append("/5")
+                        append(", isFraud=")
+                        append(isFraud)
+                    },
+                    detector = TAG
+                )
+            )
+        }
 
         return AnalysisResult(
             isFraud = isFraud,

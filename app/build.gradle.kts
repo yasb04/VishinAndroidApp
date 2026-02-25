@@ -1,8 +1,12 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
+
 
 android {
     namespace = "com.labb.vishinandroid"
@@ -18,6 +22,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val env = loadDotEnv(rootProject.file(".env"))
+        val supabaseUrl = env["SUPABASE_URL"] ?: System.getenv("SUPABASE_URL") ?: ""
+        val supabaseKey = env["SUPABASE_KEY"] ?: System.getenv("SUPABASE_KEY") ?: ""
+
+        buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
+        buildConfigField("String", "SUPABASE_KEY", "\"$supabaseKey\"")
     }
 
     buildTypes {
@@ -38,7 +49,15 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
+}
+
+fun loadDotEnv(dotEnvFile: File): Map<String, String> {
+    if (!dotEnvFile.exists()) return emptyMap()
+    val props = Properties()
+    dotEnvFile.inputStream().use { props.load(it) }
+    return props.entries.associate { (k, v) -> k.toString() to v.toString() }
 }
 
 dependencies {
@@ -54,6 +73,10 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
     implementation(libs.androidx.cardview)
     implementation(libs.litert)
+    implementation("io.github.jan-tennert.supabase:supabase-kt:3.1.4")
+    implementation("io.github.jan-tennert.supabase:postgrest-kt:3.1.4")
+    implementation("io.ktor:ktor-client-okhttp:3.1.3")
+    implementation(libs.kotlinx.serialization.json)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
