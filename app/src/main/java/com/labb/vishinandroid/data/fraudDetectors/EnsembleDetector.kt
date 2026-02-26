@@ -18,14 +18,14 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 
 
-class EnsambleDetector(
+class EnsembleDetector(
     private val context: Context,
     private val fraudEventRepository: FraudEventRepository,
 ) : FraudDetector {
 
     companion object {
         private const val VECTOR_SIZE = 1000
-        private const val TAG = "SwedishFraudModel"
+        private const val TAG = "EnsembleDetector"
         private const val LOW_CONFIDENCE_THRESHOLD = 0.40f
     }
 
