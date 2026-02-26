@@ -1,8 +1,8 @@
 package com.labb.vishinandroid.ui.screens
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -87,7 +87,7 @@ fun PermissionScreen(
             )
             Spacer(modifier = Modifier.height(32.dp))
 
-            if (!hasSms) { //sms knapp
+            if (!hasSms) {
                 Button(
                     onClick = { smsLauncher.launch(Manifest.permission.RECEIVE_SMS) },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
@@ -100,7 +100,7 @@ fun PermissionScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (!hasReadNotif) { //läs notifierings knapp
+            if (!hasReadNotif) {
                 Button(
                     onClick = {
                         val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
@@ -116,7 +116,7 @@ fun PermissionScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (!hasPostNotif) {// skicka notifierings knapp
+            if (!hasPostNotif) {
                 Button(
                     onClick = {
                         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
@@ -133,7 +133,7 @@ fun PermissionScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (!hasContacts) { // kontakt knapp
+            if (!hasContacts) {
                 Button(
                     onClick = { contactLauncher.launch(Manifest.permission.READ_CONTACTS) },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
@@ -147,7 +147,7 @@ fun PermissionScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
 
-            if (!hasPhoneState) { //phone state knapp
+            if (!hasPhoneState) {
                 Button(
                     onClick = { phoneStateLauncher.launch(Manifest.permission.READ_PHONE_STATE) },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
@@ -160,7 +160,7 @@ fun PermissionScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (!hasRecordAudio) { // Mikrofon knapp
+            if (!hasRecordAudio) {
                 Button(
                     onClick = { recordAudioLauncher.launch(Manifest.permission.RECORD_AUDIO) },
                     modifier = Modifier.fillMaxWidth(),
@@ -174,12 +174,12 @@ fun PermissionScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (!hasOverlay) { //overlay knapp
+            if (!hasOverlay) {
                 Button(
                     onClick = {
-                        // Denna permission kräver en speciell Intent
+
                         val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
-                        // intent.data = Uri.parse("package:${context.packageName}") // Valfritt: öppnar direkt för din app
+                        intent.data = Uri.parse("package:${context.packageName}")
                         context.startActivity(intent)
                     },
                     modifier = Modifier.fillMaxWidth(),

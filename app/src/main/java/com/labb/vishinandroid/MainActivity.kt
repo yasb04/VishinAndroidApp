@@ -21,10 +21,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             VishinAndroidTheme {
 
-                PermissionCoordinator(
-                    smsSender = smsSenderState.value,
-                    smsMessage = smsMessageState.value
-                )
+                PermissionCoordinator()
             }
         }
     }
@@ -34,7 +31,7 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         handleIncomingIntent(intent)
     }
-    // ser bra ut ! 
+
     private fun handleIncomingIntent(intent: Intent?) {
         intent?.let {
             val sender = it.getStringExtra("sender")

@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle // Lägg till denna dependency om den saknas
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.labb.vishinandroid.data.service.CallMonitoringService
 import com.labb.vishinandroid.domain.repositories.CallRepository
 import com.labb.vishinandroid.domain.repositories.CallSession
@@ -26,14 +26,11 @@ fun FraudCheckScreen(
     mainViewModel: MainViewModel,
     modifier: Modifier = Modifier
 ) {
-    // 1. Observera states från ViewModel istället för att ha dem lokalt
+
     val resultText by mainViewModel.fraudCheckResult.collectAsStateWithLifecycle()
     val isLoading by mainViewModel.isLoading.collectAsStateWithLifecycle()
 
-    // UI-specifika states som bara rör "navigation" inom skärmen kan vara kvar
     var message by remember { mutableStateOf("") }
-    var phoneNumber by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
     var selectedSession by remember { mutableStateOf<CallSession?>(null) }
 
     val context = LocalContext.current
@@ -54,25 +51,8 @@ fun FraudCheckScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextField(
-            value = phoneNumber,
-            onValueChange = { phoneNumber = it },
-            label = { Text("Phone Number (Optional)") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email (Optional)") },
-            modifier = Modifier.fillMaxWidth()
-        )
 
         Spacer(modifier = Modifier.height(24.dp))
-
-        // --- MANUELL TESTPANEL ---
         Text("🔧 Manuell Testpanel", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -91,7 +71,7 @@ fun FraudCheckScreen(
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text("🔴 Starta Inspelning")
+                Text("Starta Inspelning")
             }
 
             Button(
@@ -101,17 +81,16 @@ fun FraudCheckScreen(
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
-                Text("⏹️ Stoppa")
+                Text("Stoppa")
             }
         }
-        // -------------------------
+
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 2. CHECK-KNAPPEN (Anropar nu ViewModel)
+
         Button(
             onClick = {
-                // All logik för "vad som händer" ligger nu i ViewModel
                 mainViewModel.analyzeText(message)
             },
             enabled = !isLoading
@@ -138,7 +117,6 @@ fun FraudCheckScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // --- SAMTALSHISTORIK ---
         if (selectedSession == null) {
             Text(" Samtalshistorik", style = MaterialTheme.typography.headlineMedium)
             Text("Tryck på ett samtal för att se detaljer", style = MaterialTheme.typography.bodySmall)

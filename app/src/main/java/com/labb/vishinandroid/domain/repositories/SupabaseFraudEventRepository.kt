@@ -14,7 +14,6 @@ class SupabaseFraudEventRepository(
     }
 
     override suspend fun saveLowConfidenceEvent(event: LowConfidenceFraudEvent) {
-        // Never fail detection if logging fails
         runCatching {
             SupabaseClientProvider.client
                 .from(tableName)

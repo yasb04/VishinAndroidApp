@@ -22,14 +22,10 @@ import com.labb.vishinandroid.ui.viewModel.MainViewModel
 
 @Composable
 fun PermissionCoordinator(
-    smsSender: String,
-    smsMessage: String
-    // fraudService togs bort här - ViewModel sköter detta nu via Factory!
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    // Initiera states
     var hasSms by remember { mutableStateOf(PermissionUtils.hasSmsPermission(context)) }
     var hasReadNotif by remember { mutableStateOf(PermissionUtils.hasReadNotificationPermission(context)) }
     var hasPostNotif by remember { mutableStateOf(PermissionUtils.hasPostNotificationPermission(context)) }
@@ -39,7 +35,6 @@ fun PermissionCoordinator(
     var hasOverlay by remember { mutableStateOf(PermissionUtils.hasOverlayPermission(context)) }
     var hasCallLog by remember { mutableStateOf(PermissionUtils.hasCallLogPermission(context)) }
 
-    // FIXAT: Använd rätt namn "hasAccessibilityEnabled" här också
     var hasAccessibility by remember { mutableStateOf(PermissionUtils.hasAccessibilityEnabled(context)) }
 
     fun refreshAllPermissions() {

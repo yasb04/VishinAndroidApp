@@ -21,8 +21,6 @@ object ServiceReEnableHelper {
 
     fun showReEnableNotification(context: Context) {
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        // Skapa notifikationskanal (krävs för Android 8+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
@@ -34,7 +32,7 @@ object ServiceReEnableHelper {
             manager.createNotificationChannel(channel)
         }
 
-        // Intent som öppnar Tillgänglighetsinställningar
+
         val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
@@ -45,14 +43,14 @@ object ServiceReEnableHelper {
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_alert)
-            .setContentTitle("⚠️ VishingGuard inaktiverad")
+            .setContentTitle("VishingGuard inaktiverad")
             .setContentText("Tryck här för att återaktivera skyddet efter BankID.")
             .setStyle(NotificationCompat.BigTextStyle()
                 .bigText("VishingGuard har tillfälligt inaktiverats för att BankID ska fungera. Tryck här för att gå till inställningar och aktivera tjänsterna igen."))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
-            .setOngoing(true) // Kvarstår tills användaren trycker
+            .setOngoing(true)
             .build()
 
         manager.notify(NOTIFICATION_ID, notification)

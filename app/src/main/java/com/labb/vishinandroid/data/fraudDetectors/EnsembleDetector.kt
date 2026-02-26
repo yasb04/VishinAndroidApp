@@ -66,7 +66,7 @@ class EnsembleDetector(
         val totalVotes = v1 + v2 + v3 + v4 + v5
 
         val isFraud = totalVotes >= 3
-        val confidence = totalVotes.toFloat() / 5.0f // T.ex. 0.8 om 4 av 5 håller med
+        val confidence = totalVotes.toFloat() / 5.0f
 
         Log.d(TAG, "Ensemble Resultat: $isFraud (Röster: $totalVotes/5)")
 

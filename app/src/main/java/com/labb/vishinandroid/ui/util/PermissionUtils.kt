@@ -73,32 +73,4 @@ object PermissionUtils {
         return Settings.canDrawOverlays(context)
     }
 
-    fun hasAccessibility(context: Context): Boolean {
-        var accessibilityEnabled = 0
-        try {
-            accessibilityEnabled = Settings.Secure.getInt(
-                context.contentResolver,
-                Settings.Secure.ACCESSIBILITY_ENABLED
-            )
-        } catch (e: Settings.SettingNotFoundException) {
-            return false
-        }
-
-        if (accessibilityEnabled == 1) {
-            val settingValue = Settings.Secure.getString(
-                context.contentResolver,
-                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-            )
-
-            if (settingValue != null) {
-                // Skapar strängen: "com.ditt.paket/.data.service.CaptionReadingService"
-                val expectedComponentName = ComponentName(context, CaptionReadingService::class.java)
-                val expectedString = expectedComponentName.flattenToString()
-
-                return settingValue.contains(expectedString)
-            }
-        }
-        return false
-    }
-
 }

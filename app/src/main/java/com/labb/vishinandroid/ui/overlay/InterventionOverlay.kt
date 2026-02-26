@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PixelFormat
-import android.os.Build
 import android.os.CountDownTimer
 import android.view.Gravity
 import android.view.View
@@ -15,9 +14,7 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.graphics.toColorInt
 
-/**
- * Visar en varningsruta som ligger kvar i 5 sekunder.
- */
+
 @SuppressLint("SetTextI18n", "StaticFieldLeak")
 object InterventionOverlay {
 
@@ -36,7 +33,7 @@ object InterventionOverlay {
 
             val params = WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.MATCH_PARENT, // Täcker hela fönstret, kan ändra till WRAP_CONTENT istället om man vill kunna trycka på knappar bakom overlayen
+                WindowManager.LayoutParams.MATCH_PARENT,
                 windowType,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                         WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
@@ -72,7 +69,7 @@ object InterventionOverlay {
             }
 
             val title = TextView(context).apply {
-                text = "⚠️ SÄKERHETSVARNING"
+                text = "SÄKERHETSVARNING"
                 textSize = 24f
                 setTextColor(Color.RED)
                 gravity = Gravity.CENTER

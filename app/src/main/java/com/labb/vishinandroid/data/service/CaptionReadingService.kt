@@ -17,17 +17,14 @@ import kotlinx.coroutines.sync.withLock
 
 class CaptionReadingService : AccessibilityService() {
     private val TAG = "VishingGuard_DEBUG"
-
-    // Target the specific ID found in your Logcat
     private val TARGET_CAPTION_ID = "com.google.android.as:id/captions_text"
-
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val modelScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private lateinit var fraudDetector: FraudDetector
 
     // Buffer settings
-    private val BUFFER_FLUSH_INTERVAL_MS = 2000L // Wait 2s for more speech before analyzing
-    private val BUFFER_SIZE_THRESHOLD = 100      // Analyze if buffer gets long
+    private val BUFFER_FLUSH_INTERVAL_MS = 2000L
+    private val BUFFER_SIZE_THRESHOLD = 100
 
     private val textBuffer = StringBuilder()
     private var lastFullCaptionText = ""
@@ -37,7 +34,6 @@ class CaptionReadingService : AccessibilityService() {
     private val modelMutex = Mutex()
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        // Om en BankID detekterats så inaktiverar man tjänsten
         if (SensitiveApps.isSensitiveAppInForeground.get()) {
             Log.d(TAG, "BankID-läge aktivt – inaktiverar CaptionReadingService via disableSelf()")
             ServiceReEnableHelper.showReEnableNotification(this)
@@ -45,7 +41,6 @@ class CaptionReadingService : AccessibilityService() {
             return
         }
 
-        // Scans all windows (required for system overlays like Live Caption)
         val currentWindows = windows
         for (window in currentWindows) {
             if (window.type == AccessibilityWindowInfo.TYPE_SYSTEM ||
@@ -62,16 +57,13 @@ class CaptionReadingService : AccessibilityService() {
         val viewId = node.viewIdResourceName ?: ""
         val text = node.text?.toString()
 
-        // 1. STRICT FILTER: Only look for the confirmed Caption ID
         if (viewId == TARGET_CAPTION_ID && !text.isNullOrBlank()) {
-            // Ignore the "..." loading state
             if (text != "…" && text != "...") {
                 processIncrementalText(text)
             }
-            return // Found what we need, stop searching this branch
+            return
         }
 
-        // 2. RECURSE: Keep searching children for the target ID
         for (i in 0 until node.childCount) {
             findCaptionText(node.getChild(i))
         }
@@ -79,33 +71,20 @@ class CaptionReadingService : AccessibilityService() {
 
     private fun processIncrementalText(newFullText: String) {
         val cleaned = newFullText.trim()
-
-        // Skip if nothing changed
         if (cleaned == lastFullCaptionText) return
-
-        // CALCULATE NEW WORDS:
-        // Live Caption builds sentences: "My name", "My name is", "My name is Bob".
-        // We only want the part that wasn't in 'lastFullCaptionText'.
         val textToAppend = if (lastFullCaptionText.isNotEmpty() && cleaned.startsWith(lastFullCaptionText)) {
             cleaned.substring(lastFullCaptionText.length).trim()
         } else {
-            // If the text box cleared or changed completely, start fresh
             cleaned
         }
 
         if (textToAppend.isEmpty()) return
-
-        // Update tracking state
         lastFullCaptionText = cleaned
-        Log.d(TAG, "🟢 NEW SPEECH CAPTURED: $textToAppend")
-
-        // Add only the NEW part to the buffer
+        Log.d(TAG, "NEW SPEECH CAPTURED: $textToAppend")
         synchronized(textBuffer) {
             if (textBuffer.isNotEmpty()) textBuffer.append(' ')
             textBuffer.append(textToAppend)
         }
-
-        // Trigger AI analysis logic
         if (textBuffer.length >= BUFFER_SIZE_THRESHOLD) {
             flushBufferToModel()
         } else {
@@ -114,7 +93,6 @@ class CaptionReadingService : AccessibilityService() {
     }
 
     private fun scheduleFlush() {
-        // Debounce: Cancel previous timer and start a new one
         flushScheduledJob?.cancel()
         flushScheduledJob = serviceScope.launch {
             delay(BUFFER_FLUSH_INTERVAL_MS)
@@ -129,15 +107,13 @@ class CaptionReadingService : AccessibilityService() {
             toAnalyze = textBuffer.toString()
             textBuffer.clear()
         }
-
-        // Reset tracking so we can detect new sentences properly
         lastFullCaptionText = ""
 
         modelJob?.cancel()
         modelJob = modelScope.launch {
             modelMutex.withLock {
                 try {
-                    Log.d(TAG, "🧠 AI Analyzing: $toAnalyze")
+                    Log.d(TAG, "AI Analyzing: $toAnalyze")
                     val result = fraudDetector.analyze(toAnalyze)
 
                     withContext(Dispatchers.Main) {
@@ -156,7 +132,6 @@ class CaptionReadingService : AccessibilityService() {
 
     override fun onServiceConnected() {
         super.onServiceConnected()
-        // Nollställ BankID-flaggan när tjänsten startas (användaren har aktiverat igen)
         SensitiveApps.isSensitiveAppInForeground.set(false)
         ServiceReEnableHelper.cancelNotification(this)
 

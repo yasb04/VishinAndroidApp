@@ -3,8 +3,8 @@ package com.labb.vishinandroid.ui.viewModel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.labb.vishinandroid.data.factories.FraudDetectorFactory // Använd Factory
-import com.labb.vishinandroid.domain.interfaces.FraudDetector     // Använd Interface
+import com.labb.vishinandroid.data.factories.FraudDetectorFactory
+import com.labb.vishinandroid.domain.interfaces.FraudDetector
 import com.labb.vishinandroid.domain.repositories.CallRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,11 +17,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
-
-    // Hämta instansen via Factory. Nu är vi helt frikopplade från specifika klasser!
     private val fraudDetector: FraudDetector = FraudDetectorFactory.getDetector(getApplication())
 
-    val callSessions = CallRepository.sessions
 
     fun analyzeText(text: String) {
         if (text.isBlank()) {
@@ -36,17 +33,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
                 val result = fraudDetector.analyze(text)
 
-
-
-
                 _fraudCheckResult.value = buildString {
                     if (result.isFraud) {
-                        appendLine("⚠️ VARNING: Misstänkt bedrägeri!")
+                        appendLine("VARNING: Misstänkt bedrägeri!")
 
                     } else {
-                        appendLine("✅ Ser säkert ut")
+                        appendLine("Ser säkert ut")
                     }
-                    // Visa procent med 0 decimaler
                     appendLine("Sannolikhet: ${(result.score * 100).toInt()}%")
                 }
             } catch (e: Exception) {

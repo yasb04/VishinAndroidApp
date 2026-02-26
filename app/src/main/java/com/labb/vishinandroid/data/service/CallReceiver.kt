@@ -26,12 +26,9 @@ class CallReceiver : BroadcastReceiver() {
                 TelephonyManager.EXTRA_STATE_OFFHOOK -> {
                     Log.d(TAG, "Samtal besvarat. Initierar loggning.")
                     CallRepository.startNewSession(incomingNumber)
-
-                    // Kontrollera om numret är känt
                     val isKnownContact = if (!incomingNumber.isNullOrEmpty()) {
                         inPhoneBook(incomingNumber, context)
                     } else {
-                        // Om numret är dolt eller null, betrakta det som okänt för säkerhets skull
                         false
                     }
 
@@ -42,8 +39,6 @@ class CallReceiver : BroadcastReceiver() {
                         Log.d("VishingGuard", "Känd kontakt. Inget säkerhetsläge.")
                         CallStateRepository.setCallUnknown(false)
                     }
-
-
                     RecordingOverlay.show(context)
                 }
                 TelephonyManager.EXTRA_STATE_IDLE -> {
