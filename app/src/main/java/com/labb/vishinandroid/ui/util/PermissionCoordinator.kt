@@ -1,4 +1,4 @@
-package com.labb.vishinandroid.data.util
+package com.labb.vishinandroid.ui.util
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,7 +18,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 import com.labb.vishinandroid.ui.screens.FraudCheckScreen
 import com.labb.vishinandroid.ui.screens.PermissionScreen
-import com.labb.vishinandroid.ui.vievModel.MainViewModel
+import com.labb.vishinandroid.ui.viewModel.MainViewModel
 
 @Composable
 fun PermissionCoordinator(

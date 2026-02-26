@@ -5,8 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
-import com.labb.vishinandroid.data.service.MockFraudDetectionService
-import com.labb.vishinandroid.data.util.PermissionCoordinator
+import com.labb.vishinandroid.ui.util.PermissionCoordinator
 import com.labb.vishinandroid.ui.theme.VishinAndroidTheme
 
 class MainActivity : ComponentActivity() {

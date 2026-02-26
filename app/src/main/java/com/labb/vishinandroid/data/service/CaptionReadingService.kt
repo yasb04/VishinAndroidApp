@@ -7,7 +7,7 @@ import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityWindowInfo
 import com.labb.vishinandroid.data.factories.FraudDetectorFactory
 import com.labb.vishinandroid.domain.repositories.CallRepository
-import com.labb.vishinandroid.data.interfaces.FraudDetector
+import com.labb.vishinandroid.domain.interfaces.FraudDetector
 import com.labb.vishinandroid.data.util.SensitiveApps
 import com.labb.vishinandroid.data.util.ServiceReEnableHelper
 import com.labb.vishinandroid.ui.overlay.OverlayHelper

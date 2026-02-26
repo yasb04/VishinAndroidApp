@@ -1,10 +1,10 @@
-package com.labb.vishinandroid.ui.vievModel
+package com.labb.vishinandroid.ui.viewModel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.labb.vishinandroid.data.factories.FraudDetectorFactory // Använd Factory
-import com.labb.vishinandroid.data.interfaces.FraudDetector     // Använd Interface
+import com.labb.vishinandroid.domain.interfaces.FraudDetector     // Använd Interface
 import com.labb.vishinandroid.domain.repositories.CallRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

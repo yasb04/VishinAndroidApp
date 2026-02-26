@@ -1,4 +1,4 @@
-package com.labb.vishinandroid.data.util
+package com.labb.vishinandroid.ui.util
 
 import android.Manifest
 import android.content.ComponentName
@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import com.labb.vishinandroid.data.service.CaptionReadingService
 
@@ -34,7 +33,7 @@ object PermissionUtils {
         return enabledServices?.contains(expectedService) == true
     }
     fun hasPostNotificationPermission(context: Context): Boolean {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.POST_NOTIFICATIONS

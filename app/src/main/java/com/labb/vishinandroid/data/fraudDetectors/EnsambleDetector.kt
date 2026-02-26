@@ -2,9 +2,10 @@ package com.labb.vishinandroid.data.fraudDetectors
 
 import android.content.Context
 import android.util.Log
+import com.labb.vishinandroid.domain.interfaces.FraudDetector
+import com.labb.vishinandroid.domain.model.AnalysisResult
 
-import com.labb.vishinandroid.data.interfaces.FraudDetector
-import com.labb.vishinandroid.data.util.AnalysisResult
+
 import com.labb.vishinandroid.domain.model.LowConfidenceFraudEvent
 import com.labb.vishinandroid.domain.repositories.FraudEventRepository
 import com.labb.vishinandroid.domain.model.DecisionTree
@@ -17,7 +18,7 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 
 
-class SwedishFraudLocalModel(
+class EnsambleDetector(
     private val context: Context,
     private val fraudEventRepository: FraudEventRepository,
 ) : FraudDetector {
@@ -90,7 +91,7 @@ class SwedishFraudLocalModel(
             isFraud = isFraud,
             score = confidence,
 
-        )
+            )
     }
 
 

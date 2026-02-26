@@ -1,4 +1,4 @@
-package com.labb.vishinandroid.data.util
+package com.labb.vishinandroid.domain.model
 
 data class AnalysisResult(
     val isFraud: Boolean,

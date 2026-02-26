@@ -19,7 +19,7 @@ import com.labb.vishinandroid.domain.repositories.CallRepository
 import com.labb.vishinandroid.domain.repositories.CallSession
 import com.labb.vishinandroid.domain.repositories.SmsRepository
 import com.labb.vishinandroid.ui.theme.VishinAndroidTheme
-import com.labb.vishinandroid.ui.vievModel.MainViewModel
+import com.labb.vishinandroid.ui.viewModel.MainViewModel
 
 @Composable
 fun FraudCheckScreen(

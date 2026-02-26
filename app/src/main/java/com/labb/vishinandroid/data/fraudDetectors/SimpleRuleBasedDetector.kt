@@ -1,8 +1,8 @@
 package com.labb.vishinandroid.data.fraudDetectors
 
 
-import com.labb.vishinandroid.data.interfaces.FraudDetector
-import com.labb.vishinandroid.data.util.AnalysisResult
+import com.labb.vishinandroid.domain.interfaces.FraudDetector
+import com.labb.vishinandroid.domain.model.AnalysisResult
 
 class SimpleRuleBasedDetector : FraudDetector {
     override suspend fun analyze(text: String): AnalysisResult {

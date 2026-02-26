@@ -1,4 +1,4 @@
-package com.labb.vishinandroid.data.interfaces
+package com.labb.vishinandroid.domain.interfaces
 
 import com.labb.vishinandroid.domain.model.FraudRequest
 
