@@ -65,10 +65,6 @@ fun PermissionScreen(
         onResult = { isGranted -> if (isGranted) onPermissionResult() }
     )
 
-    val accessibilityLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted -> if (isGranted) onPermissionResult() }
-    )
 
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -94,13 +90,13 @@ fun PermissionScreen(
                     onClick = { smsLauncher.launch(Manifest.permission.RECEIVE_SMS) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF))
                 ) {
-                    Text("1. Tillåt SMS-åtkomst")
+                    Text("Tillåt SMS-åtkomst")
                 }
             } else {
                 Text(" SMS-åtkomst klar!", color = Color(0xFFFFFFFF))
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             if (!hasReadNotif) { //läs notifierings knapp
                 Button(
@@ -110,13 +106,13 @@ fun PermissionScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF))
                 ) {
-                    Text("2. Tillåt Notis-åtkomst")
+                    Text( "Tillåt Notis-åtkomst")
                 }
             } else {
                 Text(" Notis-åtkomst klar!", color = Color(0xFFFFFFFF))
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             if (!hasPostNotif) {// skicka notifierings knapp
                 Button(
@@ -128,25 +124,25 @@ fun PermissionScreen(
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF))
-                ) { Text("Tillåt att SKICKA notiser") }
+                ) { Text("Tillåt att Skicka notiser") }
             } else {
                 Text("Skicka notiser klar!", color = Color(0xFFFFFFFF))
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             if (!hasContacts) { // kontakt knapp
                 Button(
                     onClick = { contactLauncher.launch(Manifest.permission.READ_CONTACTS) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF))
                 ) {
-                    Text("3. Tillåt kontakt-åtkomst")
+                    Text("Tillåt kontakt-åtkomst")
                 }
             } else {
                 Text(" kontakt-åtkomst klar!", color = Color(0xFFFFFFFF))
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
 
             if (!hasPhoneState) { //phone state knapp
@@ -154,13 +150,13 @@ fun PermissionScreen(
                     onClick = { phoneStateLauncher.launch(Manifest.permission.READ_PHONE_STATE) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF))
                 ) {
-                    Text("4. Tillåt Telefonstatus-åtkomst")
+                    Text("Tillåt Telefonstatus-åtkomst")
                 }
             } else {
                 Text(" telefonstatus-åtkomst klar!", color = Color(0xFFFFFFFF))
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             if (!hasRecordAudio) { // Mikrofon knapp
                 Button(
@@ -168,13 +164,13 @@ fun PermissionScreen(
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF)) // Röd för att visa att den är viktig
                 ) {
-                    Text("5. Tillåt Mikrofon (Inspelning)")
+                    Text("Tillåt Mikrofon")
                 }
             } else {
                 Text(" Mikrofon-åtkomst klar!", color = Color(0xFFFFFFFF))
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             if (!hasOverlay) { //overlay knapp
                 Button(
@@ -187,22 +183,24 @@ fun PermissionScreen(
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF)) // Lila
                 ) {
-                    Text("6. Tillåt 'Visa över andra appar' (Fixar krasch)")
+                    Text("Tillåt 'Visa över andra appar'")
                 }
             } else {
                 Text("Overlay-åtkomst klar!", color = Color(0xFFFFFFFF))
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             if (!hasCallLog) {
                 Button(
                     onClick = { callLogLauncher.launch(Manifest.permission.READ_CALL_LOG) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF))
-                ) { Text("Tillåt Samtalslogg (Se nummer)") }
+                ) { Text("Tillåt Samtalslogg") }
             } else {
                 Text("Samtalslogg klar!", color = Color(0xFFFFFFFF))
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             if (!hasAccessibility) {
                 Button(
@@ -212,7 +210,7 @@ fun PermissionScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF))
                 ) {
-                    Text("7. Tillåt Skärmläsare (Accessibility)")
+                    Text("Tillåt Skärmläsare")
                 }
              
                 Text(
