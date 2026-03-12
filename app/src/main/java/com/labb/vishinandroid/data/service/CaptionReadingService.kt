@@ -6,6 +6,7 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityWindowInfo
 import com.labb.vishinandroid.data.factories.FraudDetectorFactory
+import com.labb.vishinandroid.data.util.CaptionUtils.extractNewText
 import com.labb.vishinandroid.domain.repositories.CallRepository
 import com.labb.vishinandroid.domain.interfaces.FraudDetector
 import com.labb.vishinandroid.data.util.SensitiveApps
@@ -70,16 +71,21 @@ class CaptionReadingService : AccessibilityService() {
     }
 
     private fun processIncrementalText(newFullText: String) {
-        val cleaned = newFullText.trim()
-        if (cleaned == lastFullCaptionText) return
-        val textToAppend = if (lastFullCaptionText.isNotEmpty() && cleaned.startsWith(lastFullCaptionText)) {
-            cleaned.substring(lastFullCaptionText.length).trim()
-        } else {
-            cleaned
-        }
+        val cleaned = newFullText
+            .replace(Regex("\\[.*?\\]"), "")
+            .replace("...", "")
+            .replace("…", "")
+            .trim()
+        if (cleaned == lastFullCaptionText || cleaned.isEmpty()) return
+
+        val textToAppend = extractNewText(lastFullCaptionText, cleaned)
+
+        lastFullCaptionText = cleaned
 
         if (textToAppend.isEmpty()) return
-        lastFullCaptionText = cleaned
+
+
+
         Log.d(TAG, "NEW SPEECH CAPTURED: $textToAppend")
         synchronized(textBuffer) {
             if (textBuffer.isNotEmpty()) textBuffer.append(' ')

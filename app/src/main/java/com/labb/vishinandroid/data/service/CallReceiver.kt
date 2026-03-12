@@ -39,7 +39,7 @@ class CallReceiver : BroadcastReceiver() {
                         Log.d("VishingGuard", "Känd kontakt. Inget säkerhetsläge.")
                         CallStateRepository.setCallUnknown(false)
                     }
-                    RecordingOverlay.show(context)
+                   // RecordingOverlay.show(context)
                 }
                 TelephonyManager.EXTRA_STATE_IDLE -> {
                     Log.d(TAG, "Samtal avslutat.")
